@@ -18,7 +18,7 @@ ApplicationWindow {
     Material.theme: Material.Light
     Material.accent: Material.DeepOrange
 
-//    flags: Qt.FramelessWindowHint
+    flags: Qt.FramelessWindowHint
 
     property int previousX
     property int previousY
@@ -80,91 +80,91 @@ ApplicationWindow {
 
 //        }
 //    }
-//    MouseArea {
-//        id: _topArea
-//        height: 5
-//        anchors.top: parent.top
-//        anchors.left: parent.left
-//        anchors.right: parent.right
+    MouseArea {
+        id: _topArea
+        height: 5
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
 
-//        cursorShape: Qt.SizeVerCursor
+        cursorShape: Qt.SizeVerCursor
 
-//        onPressed: {
-//            previousY = mouseY
-//        }
-//        onMouseYChanged: {
-//            var dy = mouseY - previousY
-//            _mainWindow.setY(_mainWindow.y + dy)
-//            _mainWindow.setHeight(_mainWindow.height - dy)
-//        }
-//    }
-//    MouseArea {
-//        id: _bottomArea
-//        height: 5
-//        anchors.bottom: parent.bottom
-//        anchors.left: parent.left
-//        anchors.right: parent.right
+        onPressed: {
+            previousY = mouseY
+        }
+        onMouseYChanged: {
+            var dy = mouseY - previousY
+            _mainWindow.setY(_mainWindow.y + dy)
+            _mainWindow.setHeight(_mainWindow.height - dy)
+        }
+    }
+    MouseArea {
+        id: _bottomArea
+        height: 5
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
 
-//        cursorShape: Qt.SizeVerCursor
+        cursorShape: Qt.SizeVerCursor
 
-//        onPressed: {
-//            previousY = mouseY
-//        }
-//        onMouseYChanged: {
-//            var dy = mouseY - previousY
-//            _mainWindow.setHeight(_mainWindow.height + dy)
-//        }
-//    }
-//    MouseArea {
-//        id: _leftArea
-//        width: 5
-//        anchors.left: parent.left
-//        anchors.top: parent.top
-//        anchors.bottom: parent.bottom
+        onPressed: {
+            previousY = mouseY
+        }
+        onMouseYChanged: {
+            var dy = mouseY - previousY
+            _mainWindow.setHeight(_mainWindow.height + dy)
+        }
+    }
+    MouseArea {
+        id: _leftArea
+        width: 5
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
 
-//        cursorShape: Qt.SizeHorCursor
+        cursorShape: Qt.SizeHorCursor
 
-//        onPressed: {
-//            previousX = mouseX
-//        }
-//        onMouseXChanged: {
-//            var dx = mouseX - previousX
-//            _mainWindow.setX(_mainWindow.x + dx)
-//            _mainWindow.setWidth(_mainWindow.width - dx)
-//        }
-//    }
-//    MouseArea {
-//        id: _rightArea
-//        width: 5
-//        anchors.right: parent.right
-//        anchors.top: parent.top
-//        anchors.bottom: parent.bottom
+        onPressed: {
+            previousX = mouseX
+        }
+        onMouseXChanged: {
+            var dx = mouseX - previousX
+            _mainWindow.setX(_mainWindow.x + dx)
+            _mainWindow.setWidth(_mainWindow.width - dx)
+        }
+    }
+    MouseArea {
+        id: _rightArea
+        width: 5
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
 
-//        cursorShape: Qt.SizeHorCursor
+        cursorShape: Qt.SizeHorCursor
 
-//        onPressed: {
-//            previousX = mouseX
-//        }
-//        onMouseXChanged: {
-//            var dx = mouseX - previousX
-//            _mainWindow.setWidth(_mainWindow.width + dx)
-//        }
-//    }
-//    MouseArea {
-//        id: _moveArea
+        onPressed: {
+            previousX = mouseX
+        }
+        onMouseXChanged: {
+            var dx = mouseX - previousX
+            _mainWindow.setWidth(_mainWindow.width + dx)
+        }
+    }
+    MouseArea {
+        id: _moveArea
 
 
-//        onPressed: {
-//            previousX = mouseX
-//            previousY = mouseY
-//        }
-//        onMouseXChanged: {
-//            var dx = mouseX - previousX
-//            _mainWindow.setX(_mainWindow.x + dx)
-//        }
-//        onMouseYChanged: {
-//            var dy = mouseY - previousY
-//            _mainWindow.setY(_mainWindow.y + dy)
-//        }
-//    }
+        onPressed: {
+            previousX = mouseX
+            previousY = mouseY
+        }
+        onMouseXChanged: {
+            var dx = mouseX - previousX
+            _mainWindow.setX(_mainWindow.x + dx)
+        }
+        onMouseYChanged: {
+            var dy = mouseY - previousY
+            _mainWindow.setY(_mainWindow.y + dy)
+        }
+    }
 }
