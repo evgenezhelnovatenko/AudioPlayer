@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/filesWithMusic">
+        <file>mySongs.txt</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>img/svg/music_player_play_icon.svg</file>
+        <file>img/svg/music_player_pause_icon.svg</file>
+        <file>img/svg/volume_control_sound_icon_.svg</file>
+        <file>img/svg/volume_mute_sound_icon.svg</file>
+        <file>img/svg/next_sound_arrow_icon_123825.svg</file>
+    </qresource>
+</RCC>
