@@ -1,5 +1,6 @@
 import QtQuick 2.0
-import QtQuick.Controls 2.12
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.12
 
 MenuBarItem {
     id: _menuBarItem
@@ -8,15 +9,15 @@ MenuBarItem {
         text: _menuBarItem.text
         font: _menuBarItem.font
         opacity: enabled ? 1.0 : 0.3
-        color: _menuBarItem.highlighted ? "#ffffff" : "red"
+        color: Material.color(Material.Pink)
         horizontalAlignment: Text.AlignLeft
         verticalAlignment: Text.AlignVCenter
         elide: Text.ElideRight
     }
     background: Rectangle {
-        implicitWidth: 40
-        implicitHeight: 40
+        implicitWidth: 20
+        height: root.height
         opacity: enabled ? 1 : 0.3
-        color: _menuBarItem.highlighted ? "#21be2b" : "transparent"
+        color: _menuBarItem.highlighted ? Material.color(Material.Lime, Material.Shade300) : "transparent"
     }
 }

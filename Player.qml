@@ -49,6 +49,8 @@ Rectangle {
 
         MainMenu {
             id: _mainMenu
+            width: root.width
+            height: 25
         }
     }
 
