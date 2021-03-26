@@ -11,14 +11,8 @@ Rectangle {
         id: highlight
         Rectangle {
             width: 180; height: 40
-            color: "lightsteelblue"; radius: 5
-            y: _songsList.currentItem.y
-//            Behavior on y {
-//                SpringAnimation {
-//                    spring: 3
-//                    damping: 0.2
-//                }
-//            }
+            color: "lightsteelblue"
+            radius: 5
         }
     }
 

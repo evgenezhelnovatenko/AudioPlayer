@@ -59,7 +59,7 @@ Rectangle {
         SongsList {
             id: _songsList
             anchors.margins: 20
-            width: 500
+            width: root.width
             height: root.height - (_playbar.height + _mainMenu.height)
 
         }

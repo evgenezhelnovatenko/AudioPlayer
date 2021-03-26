@@ -12,7 +12,7 @@ ApplicationWindow {
     id: _mainWindow
     width: 700
     height: 480
-    minimumHeight: 480
+    minimumWidth: 700
     visible: true
     title: qsTr("NeVr0t1k Player")
 
