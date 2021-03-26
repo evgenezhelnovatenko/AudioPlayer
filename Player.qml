@@ -22,6 +22,7 @@ Rectangle {
             isSongPlaying = false
             _player.stop();
         }
+
     }
 
     Audio {
@@ -33,10 +34,11 @@ Rectangle {
             if (playbackState === Audio.StoppedState) {
                 if (_player.position === _player.duration) {
                     _audioPlayerController.switchToNextSong()
+                    if (isSongPlaying)
+                        _player.play()
                 }
             }
         }
-
     }
 
 
@@ -58,7 +60,7 @@ Rectangle {
             id: _songsList
             anchors.margins: 20
             width: 500
-            height: 500
+            height: root.height - (_playbar.height + _mainMenu.height)
 
         }
     }

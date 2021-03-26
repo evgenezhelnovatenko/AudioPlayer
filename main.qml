@@ -12,6 +12,7 @@ ApplicationWindow {
     id: _mainWindow
     width: 700
     height: 480
+    minimumHeight: 480
     visible: true
     title: qsTr("NeVr0t1k Player")
 
@@ -26,7 +27,6 @@ ApplicationWindow {
     Player {
         id: _mainInteface
         anchors.fill: parent
-
     }
 
     FileDialog {
