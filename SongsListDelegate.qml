@@ -1,9 +1,11 @@
 import QtQuick 2.15
 
-Item {
+Rectangle {
     id: root
     width: _songsList.width
     height: 40
+
+    color: "transparent"
 
     function getFileName () {
         var arr = display.split('/');
@@ -21,23 +23,13 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             color: "transparent"
             Image {
-                id: _songPlayingImg
+                id: _songPlaying
                 width: 20
                 height: 20
                 source: volumeIcoSource
                 fillMode: Image.PreserveAspectFit
 
-                function q() {
-                    console.log("audioPlayer.currentSongIndex: " + audioPlayer.currentSongIndex)
-                    console.log("index: " + index)
-                    console.log("---------")
-                    if (audioPlayer.currentSongIndex === index)
-                        return true
-                    else
-                        return false
-                }
-
-                visible: _songPlayingImg.q()
+                visible: audioPlayer.currentSongIndex === index ? true : false
             }
         }
 
@@ -46,6 +38,19 @@ Item {
             font.family: "Helvetica"
             font.pointSize: 13
             anchors.verticalCenter: parent.verticalCenter
+        }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            _songsList.currentIndex = index
+        }
+        onDoubleClicked: {
+            audioPlayer.currentSongIndex = index
+            _audioPlayerController.songChange()
+            isSongPlaying = true
+            _player.play()
         }
     }
 
