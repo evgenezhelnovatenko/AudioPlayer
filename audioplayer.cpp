@@ -6,6 +6,7 @@
 
 AudioPlayer::AudioPlayer(QObject *parent)
     : QAbstractListModel {parent}
+    , m_currentSongIndex (0)
     , mySongsFile (new QFile(this))
 {
     if (!readingSongsFromMySongsFile()) {
@@ -13,7 +14,7 @@ AudioPlayer::AudioPlayer(QObject *parent)
         return;
     }
 
-    m_filepath = m_playlist[currentSongIndex];
+    m_filepath = m_playlist[m_currentSongIndex];
 }
 
 AudioPlayer::~AudioPlayer()
@@ -44,14 +45,19 @@ QVariant AudioPlayer::data(const QModelIndex &index, int role) const
 
 void AudioPlayer::switchToNextSong()
 {
-    currentSongIndex++;
+    m_currentSongIndex++;
     songChange();
 }
 
 void AudioPlayer::switchToPrevSong()
 {
-    currentSongIndex--;
+    m_currentSongIndex--;
     songChange();
+}
+
+void AudioPlayer::setCurrentSongIndex(int index)
+{
+    m_currentSongIndex = index;
 }
 
 bool AudioPlayer::isPositionValid(const size_t position) const
@@ -78,11 +84,11 @@ bool AudioPlayer::readingSongsFromMySongsFile()
 
 void AudioPlayer::songChange()
 {
-    if (!isPositionValid(currentSongIndex)) {
+    if (!isPositionValid(m_currentSongIndex)) {
         emit songsAreOver();
-        currentSongIndex = 0;
+        m_currentSongIndex = 0;
     }
-    m_filepath = m_playlist[currentSongIndex];
+    m_filepath = m_playlist[m_currentSongIndex];
     emit filepathChanged(m_filepath);
-
+    emit currentSongIndexChanged(m_currentSongIndex);
 }

@@ -7,6 +7,7 @@ import Player 1.0
 Rectangle {
 
     property bool isSongPlaying: false
+    property var audioPlayer: _audioPlayerController.getModel()
 
     id: root
     gradient: Gradient {
@@ -25,7 +26,7 @@ Rectangle {
 
     Audio {
         id: _player
-        source: _audioPlayerController.getModel().filepath
+        source: audioPlayer.filepath
         volume: 0.7
 
         onPlaybackStateChanged: {
@@ -52,7 +53,13 @@ Rectangle {
             width: root.width
             height: 25
         }
+
+        SongsList {
+            id: _songsList
+            anchors.margins: 20
+            width: 500
+            height: 500
+
+        }
     }
-
-
 }

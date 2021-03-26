@@ -36,7 +36,7 @@ Rectangle {
                     Image {
                         width: parent.width
                         height: parent.height
-                        source: "/img/svg/next_sound_arrow_icon_123825.svg"
+                        source: prevOrNextSoundIcoSource
                         mirror: true
                         fillMode: Image.PreserveAspectFit
                     }
@@ -61,8 +61,8 @@ Rectangle {
                     Image {
                         width: parent.width
                         height: parent.height
-                        source: isSongPlaying ? "/img/svg/music_player_pause_icon.svg"
-                                              : "/img/svg/music_player_play_icon.svg"
+                        source: isSongPlaying ? pauseIcoSource
+                                              : playIcoSource
                         fillMode: Image.PreserveAspectFit
                     }
 
@@ -91,7 +91,7 @@ Rectangle {
                     Image {
                         width: parent.width
                         height: parent.height
-                        source: "/img/svg/next_sound_arrow_icon_123825.svg"
+                        source: prevOrNextSoundIcoSource
                         fillMode: Image.PreserveAspectFit
                     }
 
@@ -186,7 +186,7 @@ Rectangle {
                     Rectangle {
                         width: _songLine.visualPosition * parent.width
                         height: parent.height
-                        color: "#21be2b"
+                        color: Material.color(Material.Brown, Material.Shade400)
                         radius: 2
                     }
                 }

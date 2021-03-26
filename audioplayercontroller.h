@@ -13,6 +13,7 @@ public:
 
     Q_INVOKABLE void switchToNextSong();
     Q_INVOKABLE void switchToPrevSong();
+    Q_INVOKABLE void songChange();
     Q_INVOKABLE AudioPlayer *getModel();
 
 public slots:

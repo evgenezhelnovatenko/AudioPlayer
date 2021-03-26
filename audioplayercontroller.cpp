@@ -16,6 +16,11 @@ void AudioPlayerController::switchToPrevSong()
     player.switchToPrevSong();
 }
 
+void AudioPlayerController::songChange()
+{
+    player.songChange();
+}
+
 AudioPlayer *AudioPlayerController::getModel()
 {
     return &player;

@@ -9,6 +9,7 @@ class AudioPlayer : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(QString filepath READ filepath NOTIFY filepathChanged)
+    Q_PROPERTY(int currentSongIndex READ currentSongIndex WRITE setCurrentSongIndex NOTIFY currentSongIndexChanged)
 public:
     AudioPlayer(QObject *parent = nullptr);
     ~AudioPlayer();
@@ -22,25 +23,31 @@ public:
         return m_filepath;
     }
 
+    int currentSongIndex() const
+    {
+        return m_currentSongIndex;
+    }
+
     void switchToNextSong();
     void switchToPrevSong();
+    void songChange();
+    void setCurrentSongIndex(int index);
 
 signals:
     void filepathChanged(QString filepath);
     void songsAreOver();
+    void currentSongIndexChanged(int index);
 
 private:
 
     bool isPositionValid(const size_t position) const;
     bool readingSongsFromMySongsFile();
-    void songChange();
 
     std::vector<QString> m_playlist;
-    int currentSongIndex = 0;
+    int m_currentSongIndex;
     QString m_filepath;
     QFile *mySongsFile = nullptr;
     const QString PATH_TO_MY_SONGS_FILE = ":/filesWithMusic/mySongs.txt";
-
 
 };
 

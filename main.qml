@@ -13,13 +13,15 @@ ApplicationWindow {
     width: 700
     height: 480
     visible: true
-    title: qsTr("Hello World")
+    title: qsTr("NeVr0t1k Player")
 
     Material.theme: Material.Light
     Material.accent: Material.DeepOrange
 
-    property int previousX
-    property int previousY
+    property string playIcoSource: "/img/svg/music_player_play_icon.svg"
+    property string pauseIcoSource: "/img/svg/music_player_pause_icon.svg"
+    property string prevOrNextSoundIcoSource: "/img/svg/next_sound_arrow_icon_123825.svg"
+    property string volumeIcoSource: "/img/svg/volume_control_sound_icon_.svg"
 
     Player {
         id: _mainInteface
@@ -42,41 +44,5 @@ ApplicationWindow {
             console.log("Canceled")
         }
     }
-
-//
-//            ListView {
-//                id: _listMusic
-//                width: 300
-//                height: 500
-
-//                delegate: Text {
-//                    id: _txt
-
-//                    function getFileName () {
-//                        var arr = display.split('/');
-
-//                        return arr[arr.length - 1];
-//                    }
-//                    text: _txt.getFileName()
-//                }
-
-//                Component.onCompleted: {
-//                    _listMusic.model = _audioPlayerController.getModel()
-//                }
-//            }
-
-//        }
-//
-//        Button {
-//            text: "Додати"
-//            width: 200
-//            height: 20
-
-//            onClicked: {
-//                _fileDialog.visible = true
-//            }
-
-//        }
-//    }
 
 }

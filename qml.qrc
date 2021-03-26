@@ -6,5 +6,7 @@
         <file>MainMenu.qml</file>
         <file>MainMenuDelegate.qml</file>
         <file>MainMenuItemDelegate.qml</file>
+        <file>SongsList.qml</file>
+        <file>SongsListDelegate.qml</file>
     </qresource>
 </RCC>
