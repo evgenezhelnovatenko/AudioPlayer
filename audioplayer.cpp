@@ -57,7 +57,20 @@ void AudioPlayer::switchToPrevSong()
 
 void AudioPlayer::setCurrentSongIndex(int index)
 {
+    if (index == m_currentSongIndex)
+        return;
+
     m_currentSongIndex = index;
+    emit currentSongIndexChanged(m_currentSongIndex);
+}
+
+void AudioPlayer::setnewSongsList(QStringList newSongsList)
+{
+    if (m_newSongsList == newSongsList)
+        return;
+
+    m_newSongsList = newSongsList;
+    emit newSongsListChanged(m_newSongsList);
 }
 
 bool AudioPlayer::isPositionValid(const size_t position) const

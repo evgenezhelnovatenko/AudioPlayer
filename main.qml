@@ -37,7 +37,8 @@ ApplicationWindow {
         nameFilters: "Music files (*.mp3 *.mp4 *.wpa)"
 
         onAccepted: {
-            console.log("You chose: " + _fileDialog.fileUrls)
+//            console.log("You chose: " + _fileDialog.fileUrls)
+
 
         }
         onRejected: {

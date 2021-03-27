@@ -32,19 +32,19 @@ Rectangle {
 
             highlight: highlight
 
-            focus: true
             activeFocusOnTab: true
 
             MouseArea {
-                visible: !_songsList.focus
+                visible: !_songsList.activeFocus
                 anchors.fill: parent
                 onClicked: {
-                    _songsList.focus = true
+                    _songsList.forceActiveFocus()
                 }
             }
 
             Keys.onPressed: {
                 if ((event.key === Qt.Key_Enter) || (event.key === Qt.Key_Return)) {
+
                     audioPlayer.currentSongIndex = _songsList.currentIndex
                     _audioPlayerController.songChange()
                     isSongPlaying = true;

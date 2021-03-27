@@ -42,6 +42,7 @@ Rectangle {
     }
 
     MouseArea {
+        visible: _songsList.activeFocus
         anchors.fill: parent
         onClicked: {
             _songsList.currentIndex = index
