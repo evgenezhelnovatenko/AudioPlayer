@@ -3,6 +3,9 @@ import QtMultimedia 5.15
 import QtQuick.Dialogs 1.3
 import QtQuick.Controls.Material 2.12
 import Player 1.0
+import PlayBarModule.Impl 1.0
+import MainMenuModule.Impl 1.0
+import SongsListModule.Impl 1.0
 
 Rectangle {
 
@@ -10,10 +13,6 @@ Rectangle {
     property var audioPlayer: _audioPlayerController.getModel()
 
     id: root
-    gradient: Gradient {
-        GradientStop { position: 0.0; color: Material.color(Material.DeepOrange, Material.Shade200) }
-        GradientStop { position: 1.0; color: Material.color(Material.Yellow, Material.Shade400) }
-    }
 
     AudioPlayerController {
         id: _audioPlayerController;
@@ -22,7 +21,10 @@ Rectangle {
             isSongPlaying = false
             _player.stop();
         }
-
+        onModelChanged: {
+            audioPlayer = _audioPlayerController.getModel()
+            _songsListView.updateModel()
+        }
     }
 
     Audio {
@@ -50,18 +52,34 @@ Rectangle {
             height: 50
         }
 
-        MainMenu {
+        MainMenuView {
             id: _mainMenu
             width: root.width
             height: 25
         }
 
-        SongsList {
-            id: _songsList
+        SongsListView {
+            id: _songsListView
             anchors.margins: 20
             width: root.width
             height: root.height - (_playbar.height + _mainMenu.height)
 
+        }
+    }
+
+    FileDialog {
+        id: _fileDialog
+        title: "Please choose a file"
+        folder: shortcuts.music
+        selectMultiple: true
+        nameFilters: "Music files (*.mp3 *.mp4 *.wpa)"
+
+        onAccepted: {
+            audioPlayer.newSongsList =  _fileDialog.fileUrls
+
+        }
+        onRejected: {
+            console.log("Canceled")
         }
     }
 }

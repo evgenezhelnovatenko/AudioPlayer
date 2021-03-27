@@ -18,8 +18,10 @@ public:
 
 public slots:
     void songsAreOver();
+    void updateModel();
 signals:
     void stopPlayingMusic();
+    void modelChanged();
 private:
     AudioPlayer player;
     QString m_filepath;

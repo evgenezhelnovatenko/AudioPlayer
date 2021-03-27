@@ -1,12 +1,22 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>PlayBar.qml</file>
         <file>Player.qml</file>
-        <file>MainMenu.qml</file>
-        <file>MainMenuDelegate.qml</file>
-        <file>MainMenuItemDelegate.qml</file>
-        <file>SongsList.qml</file>
-        <file>SongsListDelegate.qml</file>
+        <file>qml/MainMenuModule/Impl/MainMenuView.qml</file>
+        <file>qml/MainMenuModule/Impl/MainMenuDelegate.qml</file>
+        <file>qml/MainMenuModule/Impl/MainMenuItemDelegate.qml</file>
+        <file>qml/PlayBarModule/Impl/PlayBar.qml</file>
+        <file>qml/resources/img/svg/music_player_pause_icon.svg</file>
+        <file>qml/resources/img/svg/music_player_play_icon.svg</file>
+        <file>qml/resources/img/svg/next_sound_arrow_icon_123825.svg</file>
+        <file>qml/resources/img/svg/volume_control_sound_icon_.svg</file>
+        <file>qml/SongsListModule/Impl/SongsListView.qml</file>
+        <file>qml/SongsListModule/Impl/SongsListDelegate.qml</file>
+        <file>qml/MainMenuModule/qmldir</file>
+        <file>qml/MainMenuModule/Impl/qmldir</file>
+        <file>qml/PlayBarModule/Impl/qmldir</file>
+        <file>qml/PlayBarModule/qmldir</file>
+        <file>qml/SongsListModule/qmldir</file>
+        <file>qml/SongsListModule/Impl/qmldir</file>
     </qresource>
 </RCC>

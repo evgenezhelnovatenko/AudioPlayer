@@ -7,12 +7,27 @@ Rectangle {
     color: "transparent"
     clip: true
 
+    function updateModel() {
+        console.log("newModel: ", audioPlayer)
+        console.log("oldModel: ", _songsList.model)
+        _songsList.model = audioPlayer
+    }
+
     Component {
         id: highlight
         Rectangle {
-            width: 180; height: 40
+            width: _songsList.width; height: 40
             color: "lightsteelblue"
             radius: 5
+            y: _songsList.currentItem.y;
+            Behavior on y {
+                SmoothedAnimation {
+                    easing.type: Easing.Linear
+                    duration:200;
+                    maximumEasingTime:300
+                    velocity : 1000
+                }
+            }
         }
     }
 
@@ -31,6 +46,7 @@ Rectangle {
             boundsBehavior: Flickable.StopAtBounds
 
             highlight: highlight
+            highlightFollowsCurrentItem: false
 
             activeFocusOnTab: true
 
@@ -45,7 +61,7 @@ Rectangle {
             Keys.onPressed: {
                 if ((event.key === Qt.Key_Enter) || (event.key === Qt.Key_Return)) {
 
-                    audioPlayer.currentSongIndex = _songsList.currentIndex
+                    _songsList.model.currentSongIndex = _songsList.currentIndex
                     _audioPlayerController.songChange()
                     isSongPlaying = true;
                     _player.play()
@@ -53,8 +69,9 @@ Rectangle {
             }
 
             Component.onCompleted: {
-                _songsList.model = _audioPlayerController.getModel()
+                _songsList.model = audioPlayer
             }
+
         }
     }
 

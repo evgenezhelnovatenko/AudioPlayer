@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain("nevr0t1k.com");
 
     QQmlApplicationEngine engine;
+    engine.addImportPath(":/qml");
     const QUrl url(QStringLiteral("qrc:/main.qml"));
 
     AudioPlayer player;
