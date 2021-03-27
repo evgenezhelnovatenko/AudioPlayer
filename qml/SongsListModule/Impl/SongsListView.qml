@@ -7,12 +7,6 @@ Rectangle {
     color: "transparent"
     clip: true
 
-    function updateModel() {
-        console.log("newModel: ", audioPlayer)
-        console.log("oldModel: ", _songsList.model)
-        _songsList.model = audioPlayer
-    }
-
     Component {
         id: highlight
         Rectangle {

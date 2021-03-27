@@ -4,7 +4,6 @@ AudioPlayerController::AudioPlayerController(QObject *parent) : QObject(parent)
 {
 
     connect(&player, &AudioPlayer::songsAreOver, this, &AudioPlayerController::songsAreOver);
-    connect(&player, &AudioPlayer::newSongsWasAdded, this, &AudioPlayerController::updateModel);
 }
 
 void AudioPlayerController::switchToNextSong()
@@ -32,7 +31,3 @@ void AudioPlayerController::songsAreOver()
     emit stopPlayingMusic();
 }
 
-void AudioPlayerController::updateModel()
-{
-    emit modelChanged();
-}

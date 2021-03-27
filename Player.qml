@@ -21,10 +21,6 @@ Rectangle {
             isSongPlaying = false
             _player.stop();
         }
-        onModelChanged: {
-            audioPlayer = _audioPlayerController.getModel()
-            _songsListView.updateModel()
-        }
     }
 
     Audio {
