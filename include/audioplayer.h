@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QList>
 #include <QUrl>
+#include <QNetworkAccessManager>
 
 class AudioPlayer : public QAbstractListModel
 {
@@ -43,6 +44,10 @@ public:
     void setnewSongsList(QList<QUrl> newSongsList);
     void addNewSongs();
 
+    void downloadJsonData();
+    void startRequest(const QUrl &requestedUrl);
+
+
 signals:
     void filepathChanged(QString filepath);
     void songsAreOver();
@@ -50,7 +55,18 @@ signals:
     void newSongsListChanged(QList<QUrl> newSongsList);
     void newSongsWasAdded();
 
+
+private slots:
+
+    void httpReadyRead();
+    void httpFinished();
+    void slotAuthenticationRequired(QNetworkReply *, QAuthenticator *authenticator);
+    #ifndef QT_NO_SSL
+        void sslErrors(QNetworkReply *, const QList<QSslError> &errors);
+    #endif
+
 private:
+    std::unique_ptr<QFile> openFileForWrite(const QString &fileName);
 
     bool isPositionValid(const size_t position) const;
     bool readingSongsFromMySongsFile();
@@ -62,7 +78,11 @@ private:
     QString m_filepath;
     QList<QUrl> m_newSongsList;
     QFile *mySongsFile = nullptr;
-
+    QNetworkAccessManager qnam;
+    QNetworkReply *reply;
+    QUrl url;
+    std::unique_ptr<QFile> file;
+    QString filename;
 };
 
 #endif // AUDIOPLAYER_H

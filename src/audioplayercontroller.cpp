@@ -26,6 +26,11 @@ AudioPlayer *AudioPlayerController::getModel()
     return &player;
 }
 
+void AudioPlayerController::downloadJsonData()
+{
+    player.downloadJsonData();
+}
+
 void AudioPlayerController::songsAreOver()
 {
     emit stopPlayingMusic();

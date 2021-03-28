@@ -21,6 +21,13 @@ MenuBar {
                 _fileDialog.visible = true
             }
         }
+        Action {
+            id: _getRequest
+            text: qsTr("Отримати дані")
+            onTriggered: {
+                _audioPlayerController.downloadJsonData()
+            }
+        }
         MenuSeparator {
             id: _separator
             objectName: "separator"
@@ -40,6 +47,7 @@ MenuBar {
                 Qt.quit()
             }
         }
+
         Rectangle {
             height: 3
             color: "transparent"

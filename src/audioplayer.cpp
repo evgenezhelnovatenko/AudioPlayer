@@ -3,6 +3,9 @@
 #include <QMediaPlayer>
 #include <QDir>
 #include <QCoreApplication>
+#include <QNetworkReply>
+#include <QAuthenticator>
+#include <QMetaEnum>
 
 #include "audioplayer.h"
 
@@ -10,7 +13,11 @@ AudioPlayer::AudioPlayer(QObject *parent)
     : QAbstractListModel {parent}
     , m_currentSongIndex (0)
     , mySongsFile (new QFile(this))
+    , reply (nullptr)
+    , file (nullptr)
 {
+    filename = QDir::toNativeSeparators(QCoreApplication::applicationDirPath()) + "/file.txt";
+
     pathToMySongsFile = QDir::toNativeSeparators(QCoreApplication::applicationDirPath()) + "/mySongs.txt";
     mySongsFile->setFileName(pathToMySongsFile);
 
@@ -23,6 +30,13 @@ AudioPlayer::AudioPlayer(QObject *parent)
 
 
     connect(this, &AudioPlayer::newSongsListChanged, this, &AudioPlayer::addNewSongs);
+
+    connect(&qnam, &QNetworkAccessManager::authenticationRequired,
+                this, &AudioPlayer::slotAuthenticationRequired);
+    #ifndef QT_NO_SSL
+        connect(&qnam, &QNetworkAccessManager::sslErrors,
+                this, &AudioPlayer::sslErrors);
+    #endif
 }
 
 AudioPlayer::~AudioPlayer()
@@ -102,6 +116,97 @@ void AudioPlayer::addNewSongs()
 
 }
 
+void AudioPlayer::downloadJsonData()
+{
+    const QByteArray urlSpec = "https://musicbrainz.org/ws/2/recording/b9ad642e-b012-41c7-b72a-42cf4911f9ff?inc=artist-credits+isrcs+releases&fmt=json";
+    const QUrl newUrl = QUrl::fromEncoded(urlSpec);
+
+
+    qDebug() << "url: " << newUrl;
+    if (!newUrl.isValid()) {
+        qDebug() << "url не правильний.";
+        return;
+    }
+
+    file = openFileForWrite(filename);
+
+    if (!file)
+        return;
+
+    startRequest(newUrl);
+}
+
+void AudioPlayer::startRequest(const QUrl &requestedUrl)
+{
+    url = requestedUrl;
+
+    reply = qnam.get(QNetworkRequest(url));
+
+    connect(reply, &QNetworkReply::finished, this, &AudioPlayer::httpFinished);
+    connect(reply, &QNetworkReply::readyRead, this, &AudioPlayer::httpReadyRead);
+
+}
+
+std::unique_ptr<QFile> AudioPlayer::openFileForWrite(const QString &fileName)
+{
+    std::unique_ptr<QFile> file(new QFile(fileName));
+    if (!file->open(QIODevice::WriteOnly)) {
+        qDebug() << "Файл для результатів не відкривається";
+        return nullptr;
+    }
+    return file;
+}
+
+void AudioPlayer::httpReadyRead()
+{
+    if (file) {
+        file->write(reply->readAll());
+    }
+}
+
+void AudioPlayer::httpFinished()
+{
+    QFileInfo fi;
+    if (file) {
+        fi.setFile(file->fileName());
+        file->close();
+        file.reset();
+    }
+
+//    if (reply->error() != QNetworkReply::NoError) {
+//        QFile::remove(fi.absoluteFilePath());
+//        QMetaEnum metaEnum = QMetaEnum::fromType<QNetworkReply::NetworkError>();
+//        qDebug() << "reply->error(): " << metaEnum.valueToKey(reply->error());
+//        reply->deleteLater();
+//        reply = nullptr;
+
+//        return;
+//    }
+
+    const QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+
+    reply->deleteLater();
+    reply = nullptr;
+
+    if (!redirectionTarget.isNull()) {
+        const QUrl redirectedUrl = url.resolved(redirectionTarget.toUrl());
+        file = openFileForWrite(fi.absoluteFilePath());
+        if (!file) {
+            return;
+        }
+        startRequest(redirectedUrl);
+        return;
+    }
+}
+
+void AudioPlayer::slotAuthenticationRequired(QNetworkReply *, QAuthenticator *authenticator)
+{
+    qDebug() << authenticator->realm() << " at " << url.host();
+
+    authenticator->setUser("NeVr0t1k");
+    authenticator->setPassword("Zhe1n0v76");
+}
+
 bool AudioPlayer::isPositionValid(const size_t position) const
 {
     return (position < m_playlist.size() && position >= 0);
@@ -135,3 +240,16 @@ void AudioPlayer::songChange()
     emit filepathChanged(m_filepath);
     emit currentSongIndexChanged(m_currentSongIndex);
 }
+
+#ifndef QT_NO_SSL
+void AudioPlayer::sslErrors(QNetworkReply *, const QList<QSslError> &errors)
+{
+    QString errorString;
+    for (const QSslError &error : errors) {
+        if (!errorString.isEmpty())
+            errorString += '\n';
+        errorString += error.errorString();
+    }
+    reply->ignoreSslErrors();
+}
+#endif
