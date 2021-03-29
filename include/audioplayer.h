@@ -46,6 +46,7 @@ public:
 
     void downloadJsonData();
     void startRequest(const QUrl &requestedUrl);
+    QNetworkRequest createRequest();
 
 
 signals:
@@ -83,6 +84,7 @@ private:
     QUrl url;
     std::unique_ptr<QFile> file;
     QString filename;
+    QSslConfiguration *sslConfig;
 };
 
 #endif // AUDIOPLAYER_H

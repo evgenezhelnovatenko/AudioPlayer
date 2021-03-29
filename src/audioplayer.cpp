@@ -6,6 +6,10 @@
 #include <QNetworkReply>
 #include <QAuthenticator>
 #include <QMetaEnum>
+#include <QJsonDocument>
+#include <QJsonValue>
+#include <QJsonArray>
+#include <QJsonObject>
 
 #include "audioplayer.h"
 
@@ -118,7 +122,7 @@ void AudioPlayer::addNewSongs()
 
 void AudioPlayer::downloadJsonData()
 {
-    const QByteArray urlSpec = "https://musicbrainz.org/ws/2/recording/b9ad642e-b012-41c7-b72a-42cf4911f9ff?inc=artist-credits+isrcs+releases&fmt=json";
+    const QByteArray urlSpec = "https://musicbrainz.org/ws/2/recording/b9ad642e-b012-41c7-b72a-42cf4911f9ff?inc=artist-credits+isrcs+releases";
     const QUrl newUrl = QUrl::fromEncoded(urlSpec);
 
 
@@ -140,11 +144,24 @@ void AudioPlayer::startRequest(const QUrl &requestedUrl)
 {
     url = requestedUrl;
 
-    reply = qnam.get(QNetworkRequest(url));
+    QNetworkRequest request = createRequest();
+
+    reply = qnam.get(request);
 
     connect(reply, &QNetworkReply::finished, this, &AudioPlayer::httpFinished);
     connect(reply, &QNetworkReply::readyRead, this, &AudioPlayer::httpReadyRead);
 
+}
+
+QNetworkRequest AudioPlayer::createRequest()
+{
+    QNetworkRequest request;
+
+    request.setUrl(url);
+    request.setRawHeader("Accept","application/json");
+    request.setRawHeader("User-Agent", "AudioPlayer/1.1.0 (mr.zhelnovatenko@gmail.com)");
+
+    return request;
 }
 
 std::unique_ptr<QFile> AudioPlayer::openFileForWrite(const QString &fileName)
@@ -155,6 +172,25 @@ std::unique_ptr<QFile> AudioPlayer::openFileForWrite(const QString &fileName)
         return nullptr;
     }
     return file;
+}
+
+QJsonObject AudioPlayer::parseReply(QNetworkReply *reply)
+{
+    QJsonObject jsonObj;
+    QJsonDocument jsonDoc;
+    QJsonParseError parseError;
+    auto replyText = reply->readAll();
+    jsonDoc = QJsonDocument::fromJson(replyText, &parseError);
+    if(parseError.error != QJsonParseError::NoError){
+        qDebug() << replyText;
+        qWarning() << "Json parse error: " << parseError.errorString();
+    }else{
+        if(jsonDoc.isObject())
+            jsonObj  = jsonDoc.object();
+        else if (jsonDoc.isArray())
+            jsonObj["non_field_errors"] = jsonDoc.array();
+    }
+    return jsonObj;
 }
 
 void AudioPlayer::httpReadyRead()
@@ -173,15 +209,15 @@ void AudioPlayer::httpFinished()
         file.reset();
     }
 
-//    if (reply->error() != QNetworkReply::NoError) {
-//        QFile::remove(fi.absoluteFilePath());
-//        QMetaEnum metaEnum = QMetaEnum::fromType<QNetworkReply::NetworkError>();
-//        qDebug() << "reply->error(): " << metaEnum.valueToKey(reply->error());
-//        reply->deleteLater();
-//        reply = nullptr;
+    if (reply->error() != QNetworkReply::NoError) {
+        QFile::remove(fi.absoluteFilePath());
+        QMetaEnum metaEnum = QMetaEnum::fromType<QNetworkReply::NetworkError>();
+        qDebug() << "reply->error(): " << metaEnum.valueToKey(reply->error());
+        reply->deleteLater();
+        reply = nullptr;
 
-//        return;
-//    }
+        return;
+    }
 
     const QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
 

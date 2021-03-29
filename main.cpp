@@ -13,6 +13,8 @@ int main(int argc, char *argv[])
 
     app.setOrganizationName("NeVr0t1k Corp.");
     app.setOrganizationDomain("nevr0t1k.com");
+    app.setApplicationName("AudioPlayer");
+    app.setApplicationVersion("1.1.0");
 
     QQmlApplicationEngine engine;
     engine.addImportPath(":/qml");
