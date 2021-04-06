@@ -4,6 +4,7 @@ AudioPlayerController::AudioPlayerController(QObject *parent) : QObject(parent)
 {
 
     connect(&player, &AudioPlayer::songsAreOver, this, &AudioPlayerController::songsAreOver);
+    connect(&player, &AudioPlayer::rowsAboutToBeInserted, this, &AudioPlayerController::modelHasBeenChanged);
 }
 
 void AudioPlayerController::switchToNextSong()

@@ -46,7 +46,6 @@ public:
 
     void downloadJsonData();
     void startRequest(const QUrl &requestedUrl);
-    QNetworkRequest createRequest();
 
 
 signals:
@@ -68,6 +67,8 @@ private slots:
 
 private:
     std::unique_ptr<QFile> openFileForWrite(const QString &fileName);
+    QJsonObject parseReply(QNetworkReply *reply);
+    QNetworkRequest createRequest();
 
     bool isPositionValid(const size_t position) const;
     bool readingSongsFromMySongsFile();

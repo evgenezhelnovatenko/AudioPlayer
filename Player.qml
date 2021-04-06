@@ -21,6 +21,9 @@ Rectangle {
             isSongPlaying = false
             _player.stop();
         }
+        onModelHasBeenChanged: {
+            audioPlayer = _audioPlayerController.getModel()
+        }
     }
 
     Audio {
@@ -72,7 +75,6 @@ Rectangle {
 
         onAccepted: {
             audioPlayer.newSongsList =  _fileDialog.fileUrls
-
         }
         onRejected: {
             console.log("Canceled")

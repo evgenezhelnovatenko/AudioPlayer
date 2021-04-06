@@ -69,19 +69,21 @@ QVariant AudioPlayer::data(const QModelIndex &index, int role) const
     return QVariant::fromValue(m_playlist[index_row]);
 }
 
-void AudioPlayer::switchToNextSong()
+void AudioPlayer::switchToNextSong() // Зміна поточної музики на наступну.
 {
     m_currentSongIndex++;
     songChange();
+    qDebug() << m_currentSongIndex << "\t" << m_filepath;
 }
 
-void AudioPlayer::switchToPrevSong()
+void AudioPlayer::switchToPrevSong() // Змінити поточну музику на попередню.
 {
     m_currentSongIndex--;
     songChange();
+    qDebug() << m_currentSongIndex << "\t" << m_filepath;
 }
 
-void AudioPlayer::setCurrentSongIndex(int index)
+void AudioPlayer::setCurrentSongIndex(int index) // Зміна поточного індексу музики.
 {
     if (index == m_currentSongIndex)
         return;
@@ -90,16 +92,17 @@ void AudioPlayer::setCurrentSongIndex(int index)
     emit currentSongIndexChanged(m_currentSongIndex);
 }
 
-void AudioPlayer::setnewSongsList(QList<QUrl> newSongsList)
+void AudioPlayer::setnewSongsList(QList<QUrl> newSongsList) // Зміна списку нової музики.
 {
     if (m_newSongsList == newSongsList)
         return;
 
     m_newSongsList = newSongsList;
     emit newSongsListChanged(m_newSongsList);
+    m_newSongsList.clear();
 }
 
-void AudioPlayer::addNewSongs()
+void AudioPlayer::addNewSongs() // Додаваня списку нової музики у поточний список музики.
 {
     if (!mySongsFile->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
         qDebug() << "Помилка при додаванні нових файлів. Файл з музикою пошкоджено або видалено!";
@@ -110,8 +113,8 @@ void AudioPlayer::addNewSongs()
     beginInsertRows(QModelIndex(), m_playlist.size(), m_playlist.size() + m_newSongsList.size() - 1);
     for (int i = 0; i < m_newSongsList.size(); i++) {
 
-        QString newSong = "\n" + m_newSongsList.at(i).toLocalFile();
-        out << newSong;
+        QString newSong = m_newSongsList.at(i).toLocalFile();
+        out << "\r" << newSong;
         m_playlist.push_back(newSong);
     }
     endInsertRows();
@@ -248,7 +251,7 @@ bool AudioPlayer::isPositionValid(const size_t position) const
     return (position < m_playlist.size() && position >= 0);
 }
 
-bool AudioPlayer::readingSongsFromMySongsFile()
+bool AudioPlayer::readingSongsFromMySongsFile() // Зчитування списку пісень з файлу та запис їх у m_playlist.
 {
 
     if (!mySongsFile->open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -266,15 +269,15 @@ bool AudioPlayer::readingSongsFromMySongsFile()
     return true;
 }
 
-void AudioPlayer::songChange()
+void AudioPlayer::songChange() // Зміна поточної пісні
 {
     if (!isPositionValid(m_currentSongIndex)) {
         emit songsAreOver();
         m_currentSongIndex = 0;
     }
     m_filepath = m_playlist[m_currentSongIndex];
-    emit filepathChanged(m_filepath);
     emit currentSongIndexChanged(m_currentSongIndex);
+    emit filepathChanged(m_filepath);
 }
 
 #ifndef QT_NO_SSL

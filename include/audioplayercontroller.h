@@ -21,6 +21,7 @@ public slots:
     void songsAreOver();
 signals:
     void stopPlayingMusic();
+    void modelHasBeenChanged();
 private:
     AudioPlayer player;
     QString m_filepath;
