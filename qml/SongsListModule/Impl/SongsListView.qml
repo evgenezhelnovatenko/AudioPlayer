@@ -45,11 +45,12 @@ Rectangle {
             activeFocusOnTab: true
 
             MouseArea {
-                visible: !_songsList.activeFocus
+                visible: false // !_songsList.activeFocus
                 anchors.fill: parent
                 onClicked: {
                     _songsList.forceActiveFocus()
                 }
+
             }
 
             Keys.onPressed: {
@@ -67,6 +68,40 @@ Rectangle {
             }
 
         }
+
+
+
+    }
+
+    Popup {
+        id: _popup
+        height: 200
+        width: 200
+        background: Rectangle {
+
+            implicitWidth: 200
+            implicitHeight: 200
+            border.color: "#444"
+            color: Material.color(Material.Cyan)
+        }
+        enter: Transition {
+            NumberAnimation { property: "opacity"; from: 0.7; to: 1.0; duration: 50 }
+        }
+        exit: Transition {
+            NumberAnimation { property: "opacity"; from: 1.0; to: 0.7; duration: 50 }
+        }
+
+        contentItem: Column {
+            Action {
+                id: _deleteSong
+                text: qsTr("Видалити пісню")
+                onTriggered: {
+
+                }
+            }
+        }
+
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
     }
 
     Rectangle {

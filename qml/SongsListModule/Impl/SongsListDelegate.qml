@@ -1,4 +1,6 @@
 import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.12
 
 Rectangle {
     id: root
@@ -42,17 +44,43 @@ Rectangle {
     }
 
     MouseArea {
-        visible: _songsList.activeFocus
+        visible: true // _songsList.activeFocus
         anchors.fill: parent
         onClicked: {
             _songsList.currentIndex = index
         }
+
+        onPressed: {
+            if (mouse.button == Qt.RightButton) {
+                console.log("kykykyky");
+
+            }
+
+            var positionInSongsList = mapToItem(_scrollView.parent, mouseX, mouseY)
+
+            _popup.x = positionInSongsList.x
+            _popup.y = positionInSongsList.y
+
+            if (positionInSongsList.x + _popup.width > _scrollView.parent.width) {
+                _popup.x = _scrollView.parent.width - _popup.width
+            }
+            if (positionInSongsList.y + _popup.height > _scrollView.parent.height) {
+                _popup.y = positionInSongsList.y - _popup.height
+            }
+
+            _popup.open()
+
+        }
+
         onDoubleClicked: {
             audioPlayer.currentSongIndex = index
             _audioPlayerController.songChange()
             isSongPlaying = true
             _player.play()
         }
+
     }
+
+
 
 }
