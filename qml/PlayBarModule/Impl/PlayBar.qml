@@ -71,6 +71,9 @@ Rectangle {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
                         onClicked:  {
+                            if (!_player.hasAudio)
+                                return
+
                             if (isSongPlaying) {
                                 isSongPlaying = false
                                 _player.pause()

@@ -20,6 +20,7 @@ Rectangle {
         onStopPlayingMusic: {
             isSongPlaying = false
             _player.stop();
+            audioPlayer.filepath = ""
         }
         onModelHasBeenChanged: {
             audioPlayer = _audioPlayerController.getModel()

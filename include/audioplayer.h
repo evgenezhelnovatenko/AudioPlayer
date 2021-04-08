@@ -11,7 +11,7 @@
 class AudioPlayer : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QString filepath READ filepath NOTIFY filepathChanged)
+    Q_PROPERTY(QString filepath READ filepath WRITE setFilepath NOTIFY filepathChanged)
     Q_PROPERTY(int currentSongIndex READ currentSongIndex WRITE setCurrentSongIndex NOTIFY currentSongIndexChanged)
     Q_PROPERTY(QList<QUrl> newSongsList READ newSongsList WRITE setnewSongsList NOTIFY newSongsListChanged)
 public:
@@ -40,18 +40,20 @@ public:
     void switchToNextSong(); // Зміна поточної музики на наступну.
     void switchToPrevSong(); // Змінити поточну музику на попередню.
     void songChange(); // Зміна поточної пісні.
-    void setCurrentSongIndex(int index); // Зміна поточного індексу музики.
-    void setnewSongsList(QList<QUrl> newSongsList); // Зміна списку нової музики.
     void addNewSongs(); // Додаваня списку нової музики у поточний список музики.
     void deleteSong(int songIndex); // Видалення пісні за індексом.
-
     void downloadJsonData();
     void startRequest(const QUrl &requestedUrl);
 
 
+public slots:
+    void setnewSongsList(QList<QUrl> newSongsList); // Зміна списку нової музики.
+    void setCurrentSongIndex(int index); // Зміна поточного індексу музики.
+    void setFilepath(QString filepath); // Зміна шляху до поточної пісні.
+
 signals:
     void filepathChanged(QString filepath);
-    void songsAreOver();
+    void stopThePlayer();
     void currentSongIndexChanged(int index);
     void newSongsListChanged(QList<QUrl> newSongsList);
     void newSongsWasAdded();

@@ -19,7 +19,7 @@ public:
     Q_INVOKABLE void deleteSong(int songIndex);
 
 public slots:
-    void songsAreOver();
+    void stopThePlayer();
 signals:
     void stopPlayingMusic();
     void modelHasBeenChanged();

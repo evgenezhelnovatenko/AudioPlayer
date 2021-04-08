@@ -100,6 +100,15 @@ void AudioPlayer::setnewSongsList(QList<QUrl> newSongsList)
     m_newSongsList.clear();
 }
 
+void AudioPlayer::setFilepath(QString filepath)
+{
+    if (m_filepath == filepath)
+        return;
+
+    m_filepath = filepath;
+    emit filepathChanged(m_filepath);
+}
+
 void AudioPlayer::addNewSongs()
 {
     if (!mySongsFile->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
@@ -130,6 +139,15 @@ void AudioPlayer::deleteSong(int songIndex)
     endRemoveRows();
 
     dubbingToSongsFile();
+
+    if (songIndex < m_currentSongIndex) {
+        m_currentSongIndex--;
+        emit currentSongIndexChanged(m_currentSongIndex);
+    } else if (songIndex == m_currentSongIndex) {
+        m_currentSongIndex = -1;
+        emit currentSongIndexChanged(m_currentSongIndex);
+        emit stopThePlayer();
+    }
 }
 
 void AudioPlayer::downloadJsonData()
@@ -281,8 +299,10 @@ bool AudioPlayer::readingSongsFromMySongsFile() // Зчитування спис
 void AudioPlayer::songChange()
 {
     if (!isPositionValid(m_currentSongIndex)) {
-        emit songsAreOver();
-        m_currentSongIndex = 0;
+        emit stopThePlayer();
+        m_currentSongIndex = -1;
+        emit currentSongIndexChanged(m_currentSongIndex);
+        return;
     }
     m_filepath = m_playlist[m_currentSongIndex];
     emit currentSongIndexChanged(m_currentSongIndex);

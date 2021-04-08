@@ -3,7 +3,7 @@
 AudioPlayerController::AudioPlayerController(QObject *parent) : QObject(parent)
 {
 
-    connect(&player, &AudioPlayer::songsAreOver, this, &AudioPlayerController::songsAreOver);
+    connect(&player, &AudioPlayer::stopThePlayer, this, &AudioPlayerController::stopThePlayer);
     connect(&player, &AudioPlayer::rowsAboutToBeInserted, this, &AudioPlayerController::modelHasBeenChanged);
 }
 
@@ -37,7 +37,7 @@ void AudioPlayerController::deleteSong(int songIndex)
     player.deleteSong(songIndex);
 }
 
-void AudioPlayerController::songsAreOver()
+void AudioPlayerController::stopThePlayer()
 {
     emit stopPlayingMusic();
 }

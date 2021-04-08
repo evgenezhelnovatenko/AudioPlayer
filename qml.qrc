@@ -18,5 +18,9 @@
         <file>qml/PlayBarModule/qmldir</file>
         <file>qml/SongsListModule/qmldir</file>
         <file>qml/SongsListModule/Impl/qmldir</file>
+        <file>qml/PopupMenuModule/Impl/qmldir</file>
+        <file>qml/PopupMenuModule/qmldir</file>
+        <file>qml/PopupMenuModule/Impl/PopupMenuView.qml</file>
+        <file>qml/PopupMenuModule/Impl/PopupMenuDelegate.qml</file>
     </qresource>
 </RCC>

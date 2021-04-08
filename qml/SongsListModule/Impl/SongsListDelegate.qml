@@ -50,8 +50,8 @@ Rectangle {
 
         onPressed: {
             if (mouse.button == Qt.RightButton) {
-                changePopouCoord(mouse.x, mouse.y)
-                _popup.open()
+                var newPopupCoords = getNewPopupCoord(mouse.x, mouse.y)
+                _popup.popup(_scrollView.parent, newPopupCoords.x, newPopupCoords.y)
             }
 
             _songsList.currentIndex = index
@@ -68,18 +68,23 @@ Rectangle {
     }
 
 
-    function changePopouCoord(mouseX, mouseY) {
+    function getNewPopupCoord(mouseX, mouseY) {
+
         var positionInSongsList = mapToItem(_scrollView.parent, mouseX, mouseY)
 
-        _popup.x = positionInSongsList.x
-        _popup.y = positionInSongsList.y
+        var newCoords = {
+            x: positionInSongsList.x,
+            y: positionInSongsList.y
+        }
 
         if (positionInSongsList.x + _popup.width > _scrollView.parent.width) {
-            _popup.x = _scrollView.parent.width - _popup.width
+            newCoords.x = _scrollView.parent.width - _popup.width
         }
         if (positionInSongsList.y + _popup.height > _scrollView.parent.height) {
-            _popup.y = positionInSongsList.y - _popup.height
+            newCoords.y = positionInSongsList.y - _popup.height
         }
+
+        return newCoords;
     }
 
 }
