@@ -17,105 +17,112 @@ Rectangle {
             Layout.fillHeight: true
             Layout.preferredWidth: root.width / 3
             Layout.minimumWidth: 215
-            Layout.maximumWidth: 300
 
             color: "transparent"
 
-            Row {
-                width: 350
-                spacing: 6
+            RowLayout {
                 anchors.fill: parent
-                anchors.margins: 15
 
-                Rectangle {
-                    id: prevMusic
-                    width: 20
-                    height: 20
-                    color: "transparent"
+                Row {
+                    width: 350
+                    spacing: 6
+                    anchors.fill: parent
+                    anchors.margins: 15
 
-                    Image {
-                        width: parent.width
-                        height: parent.height
-                        source: prevOrNextSoundIcoSource
-                        mirror: true
-                        fillMode: Image.PreserveAspectFit
-                    }
+                    Rectangle {
+                        id: prevMusic
+                        width: 20
+                        height: 20
+                        color: "transparent"
 
-                    MouseArea {
-                        id: prevArea
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked:  {
-                            _audioPlayerController.switchToPrevSong()
-                            if (isSongPlaying)
-                                _player.play()
+                        Image {
+                            width: parent.width
+                            height: parent.height
+                            source: prevOrNextSoundIcoSource
+                            mirror: true
+                            fillMode: Image.PreserveAspectFit
                         }
-                    }
-                }
-                Rectangle {
-                    id: _playOrPauseMusic
-                    width: 20
-                    height: 20
-                    color: "transparent"
 
-                    Image {
-                        width: parent.width
-                        height: parent.height
-                        source: isSongPlaying ? pauseIcoSource
-                                              : playIcoSource
-                        fillMode: Image.PreserveAspectFit
-                    }
-
-                    MouseArea {
-                        id: playArea
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked:  {
-                            if (!_player.hasAudio)
-                                return
-
-                            if (isSongPlaying) {
-                                isSongPlaying = false
-                                _player.pause()
-                            } else {
-                                isSongPlaying = true
-                                _player.play()
+                        MouseArea {
+                            id: prevArea
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked:  {
+                                _audioPlayerController.switchToPrevSong()
+                                if (isSongPlaying)
+                                    _player.play()
                             }
+                        }
+                    }
+                    Rectangle {
+                        id: _playOrPauseMusic
+                        width: 20
+                        height: 20
+                        color: "transparent"
 
+                        Image {
+                            width: parent.width
+                            height: parent.height
+                            source: isSongPlaying ? pauseIcoSource
+                                                  : playIcoSource
+                            fillMode: Image.PreserveAspectFit
+                        }
+
+                        MouseArea {
+                            id: playArea
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked:  {
+                                if (!_player.hasAudio)
+                                    return
+
+                                if (isSongPlaying) {
+                                    isSongPlaying = false
+                                    _player.pause()
+                                } else {
+                                    isSongPlaying = true
+                                    _player.play()
+                                }
+
+                            }
+                        }
+                    }
+                    Rectangle {
+                        id: nextMusic
+                        width: 20
+                        height: 20
+                        color: "transparent"
+
+                        Image {
+                            width: parent.width
+                            height: parent.height
+                            source: prevOrNextSoundIcoSource
+                            fillMode: Image.PreserveAspectFit
+                        }
+
+                        MouseArea {
+                            id: nextArea
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked:  {
+                                _audioPlayerController.switchToNextSong()
+                                if (isSongPlaying)
+                                    _player.play()
+                            }
                         }
                     }
                 }
-                Rectangle {
-                    id: nextMusic
-                    width: 20
-                    height: 20
-                    color: "transparent"
 
-                    Image {
-                        width: parent.width
-                        height: parent.height
-                        source: prevOrNextSoundIcoSource
-                        fillMode: Image.PreserveAspectFit
-                    }
-
-                    MouseArea {
-                        id: nextArea
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked:  {
-                            _audioPlayerController.switchToNextSong()
-                            if (isSongPlaying)
-                                _player.play()
-                        }
-                    }
-                }
                 Slider {
                     id: _songVolume
+                    width: 200
                     from: 1
                     value: 70
                     to: 100
 
-                    anchors.verticalCenter: parent.verticalCenter
+
+                    Layout.alignment: Qt.AlignCenter
+
 
                     background: Rectangle {
                         x: _songVolume.leftPadding
@@ -150,6 +157,7 @@ Rectangle {
                     }
                 }
             }
+
         }
         Rectangle {
             Layout.preferredWidth: 2
@@ -167,48 +175,75 @@ Rectangle {
 
             color: "transparent"
 
-            Slider {
-                id: _songLine
-                from: 1
-                value: _player.position / 1000
-                to: _player.duration / 1000
-
+            RowLayout {
                 anchors.fill: parent
-                anchors.rightMargin: 15
+                spacing: 2
 
-                background: Rectangle {
-                    x: _songLine.leftPadding
-                    y: _songLine.topPadding + _songLine.availableHeight / 2 - height / 2
-                    implicitWidth: 200
-                    implicitHeight: 4
-                    width: _songLine.availableWidth
-                    height: implicitHeight
-                    radius: 2
-                    color: "#bdbebf"
+                Rectangle {
 
-                    Rectangle {
-                        width: _songLine.visualPosition * parent.width
+                    Layout.maximumWidth: 50
+                    Layout.maximumHeight: 50
+                    Layout.minimumWidth: 50
+                    Layout.minimumHeight: 50
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignVCenter
+
+                    color: "transparent"
+                    Image {
+                        id: _noneSongImg
+                        width: parent.width
                         height: parent.height
-                        color: Material.color(Material.Brown, Material.Shade400)
-                        radius: 2
+                        source: noneSongImageImgSource
+                        fillMode: Image.PreserveAspectFit
+                        visible: true
                     }
                 }
-                handle: Rectangle {
-                    x: _songLine.leftPadding + _songLine.visualPosition * (_songLine.availableWidth - width)
-                    y: _songLine.topPadding + _songLine.availableHeight / 2 - height * 0.75
-                    implicitWidth: 4
-                    implicitHeight: 10
-                    color: Material.color(Material.Brown)
-                }
 
-                onMoved: {
-                    _player.stop()
-                    _player.seek(_songLine.value * 1000)
-                    if (isSongPlaying)
-                        _player.play()
+                Slider {
+                    id: _songLine
+                    from: 1
+                    value: _player.position / 1000
+                    to: _player.duration / 1000
 
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignBottom
+
+                    background: Rectangle {
+                        x: _songLine.leftPadding
+                        y: _songLine.topPadding + _songLine.availableHeight / 2 - height / 2
+                        implicitWidth: 200
+                        implicitHeight: 4
+                        width: _songLine.availableWidth
+                        height: implicitHeight
+                        radius: 2
+                        color: "#bdbebf"
+
+                        Rectangle {
+                            width: _songLine.visualPosition * parent.width
+                            height: parent.height
+                            color: Material.color(Material.Brown, Material.Shade400)
+                            radius: 2
+                        }
+                    }
+                    handle: Rectangle {
+                        x: _songLine.leftPadding + _songLine.visualPosition * (_songLine.availableWidth - width)
+                        y: _songLine.topPadding + _songLine.availableHeight / 2 - height * 0.75
+                        implicitWidth: 4
+                        implicitHeight: 10
+                        color: Material.color(Material.Brown)
+                    }
+
+                    onMoved: {
+                        _player.stop()
+                        _player.seek(_songLine.value * 1000)
+                        if (isSongPlaying)
+                            _player.play()
+
+                    }
                 }
             }
+
         }
         Rectangle {
             Layout.fillHeight: true

@@ -22,5 +22,6 @@
         <file>qml/PopupMenuModule/qmldir</file>
         <file>qml/PopupMenuModule/Impl/PopupMenuView.qml</file>
         <file>qml/PopupMenuModule/Impl/PopupMenuDelegate.qml</file>
+        <file>qml/resources/img/songImageNotFoundImg.jpg</file>
     </qresource>
 </RCC>

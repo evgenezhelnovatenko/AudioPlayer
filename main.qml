@@ -20,6 +20,7 @@ ApplicationWindow {
     property string pauseIcoSource: "/qml/resources/img/svg/music_player_pause_icon.svg"
     property string prevOrNextSoundIcoSource: "/qml/resources/img/svg/next_sound_arrow_icon_123825.svg"
     property string volumeIcoSource: "/qml/resources/img/svg/volume_control_sound_icon_.svg"
+    property string noneSongImageImgSource: "/qml/resources/img/songImageNotFoundImg.jpg"
 
     Player {
         id: _mainInteface
