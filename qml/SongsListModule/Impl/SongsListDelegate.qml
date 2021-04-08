@@ -46,30 +46,16 @@ Rectangle {
     MouseArea {
         visible: true // _songsList.activeFocus
         anchors.fill: parent
-        onClicked: {
-            _songsList.currentIndex = index
-        }
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
 
         onPressed: {
             if (mouse.button == Qt.RightButton) {
-                console.log("kykykyky");
-
+                changePopouCoord(mouse.x, mouse.y)
+                _popup.open()
             }
 
-            var positionInSongsList = mapToItem(_scrollView.parent, mouseX, mouseY)
-
-            _popup.x = positionInSongsList.x
-            _popup.y = positionInSongsList.y
-
-            if (positionInSongsList.x + _popup.width > _scrollView.parent.width) {
-                _popup.x = _scrollView.parent.width - _popup.width
-            }
-            if (positionInSongsList.y + _popup.height > _scrollView.parent.height) {
-                _popup.y = positionInSongsList.y - _popup.height
-            }
-
-            _popup.open()
-
+            _songsList.currentIndex = index
+            _songsList.forceActiveFocus()
         }
 
         onDoubleClicked: {
@@ -82,5 +68,19 @@ Rectangle {
     }
 
 
+    function changePopouCoord(mouseX, mouseY) {
+        var positionInSongsList = mapToItem(_scrollView.parent, mouseX, mouseY)
+
+        _popup.x = positionInSongsList.x
+        _popup.y = positionInSongsList.y
+
+        if (positionInSongsList.x + _popup.width > _scrollView.parent.width) {
+            _popup.x = _scrollView.parent.width - _popup.width
+        }
+        if (positionInSongsList.y + _popup.height > _scrollView.parent.height) {
+            _popup.y = positionInSongsList.y - _popup.height
+        }
+    }
 
 }
+

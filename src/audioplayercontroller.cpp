@@ -32,6 +32,11 @@ void AudioPlayerController::downloadJsonData()
     player.downloadJsonData();
 }
 
+void AudioPlayerController::deleteSong(int songIndex)
+{
+    player.deleteSong(songIndex);
+}
+
 void AudioPlayerController::songsAreOver()
 {
     emit stopPlayingMusic();

@@ -37,12 +37,13 @@ public:
         return m_newSongsList;
     }
 
-    void switchToNextSong();
-    void switchToPrevSong();
-    void songChange();
-    void setCurrentSongIndex(int index);
-    void setnewSongsList(QList<QUrl> newSongsList);
-    void addNewSongs();
+    void switchToNextSong(); // Зміна поточної музики на наступну.
+    void switchToPrevSong(); // Змінити поточну музику на попередню.
+    void songChange(); // Зміна поточної пісні.
+    void setCurrentSongIndex(int index); // Зміна поточного індексу музики.
+    void setnewSongsList(QList<QUrl> newSongsList); // Зміна списку нової музики.
+    void addNewSongs(); // Додаваня списку нової музики у поточний список музики.
+    void deleteSong(int songIndex); // Видалення пісні за індексом.
 
     void downloadJsonData();
     void startRequest(const QUrl &requestedUrl);
@@ -66,6 +67,8 @@ private slots:
     #endif
 
 private:
+    void dubbingToSongsFile(); // Перезапис пісень у файл mySongs.txt.
+
     std::unique_ptr<QFile> openFileForWrite(const QString &fileName);
     QJsonObject parseReply(QNetworkReply *reply);
     QNetworkRequest createRequest();

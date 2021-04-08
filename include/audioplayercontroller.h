@@ -16,6 +16,7 @@ public:
     Q_INVOKABLE void songChange();
     Q_INVOKABLE AudioPlayer *getModel();
     Q_INVOKABLE void downloadJsonData();
+    Q_INVOKABLE void deleteSong(int songIndex);
 
 public slots:
     void songsAreOver();
