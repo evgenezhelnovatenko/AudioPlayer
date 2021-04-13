@@ -1,5 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQuickStyle>
 #include "audioplayer.h"
 #include "audioplayercontroller.h"
 
@@ -23,6 +24,7 @@ int main(int argc, char *argv[])
     AudioPlayer player;
     qmlRegisterType<AudioPlayer>("Player", 1, 0, "AudioPlayer");
     qmlRegisterType<AudioPlayerController>("Player", 1, 0, "AudioPlayerController");
+    QQuickStyle::setStyle("Material");
 
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {

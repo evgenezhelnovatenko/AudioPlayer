@@ -3,16 +3,13 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.12
 
 MenuBar {
+    property int menuHeight: 30
+
     id: root
 
-    property int menuHeight: 30
     Menu {
         title: qsTr("Файл")
 
-        Rectangle {
-            height: 3
-            color: "transparent"
-        }
         Action {
             id: _addAction
             text: qsTr("Додати пісні")
@@ -48,21 +45,12 @@ MenuBar {
             }
         }
 
-        Rectangle {
-            height: 3
-            color: "transparent"
-        }
-
         delegate: MainMenuItemDelegate { }
 
     }
     Menu {
         title: qsTr("Довідка")
 
-        Rectangle {
-            height: 3
-            color: "transparent"
-        }
         Action {
             id: _helpAction
             text: qsTr("Інструкція")
@@ -78,10 +66,6 @@ MenuBar {
                 console.log("Про нас pressed!")
             }
         }
-        Rectangle {
-            height: 3
-            color: "transparent"
-        }
 
         delegate: MainMenuItemDelegate { }
 
@@ -91,8 +75,7 @@ MenuBar {
     delegate: MainMenuDelegate {}
 
     background: Rectangle {
-
-        implicitHeight: root.height
+        height: root.height
         color: Material.color(Material.Grey)
         opacity: 0.15
     }

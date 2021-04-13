@@ -3,8 +3,22 @@ import QtQuick.Layouts 1.15
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.12
+import PlayBarModule.Base 1.0
 
 Rectangle {
+    property int currMinute: _player.position / 60000
+    property int currSecond: _player.position / 1000 % 60
+    property int minutesLeftUntilToTheEnd: (_player.duration - _player.position) / 60000
+    property int secondsLeftUntilToTheEnd: (_player.duration - _player.position) / 1000 % 60
+
+    function convertSecondsToText(seconds) {
+        var secondsAbs = Math.abs(seconds)
+        if (secondsAbs < 10)
+            return "0" + secondsAbs
+        else
+            return secondsAbs
+    }
+
     id: root
     gradient: Gradient {
         GradientStop { position: 0.0; color: Material.color(Material.Yellow) }
@@ -26,8 +40,10 @@ Rectangle {
                 Row {
                     width: 350
                     spacing: 6
-                    anchors.fill: parent
-                    anchors.margins: 15
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.margins: 15
 
                     Rectangle {
                         id: prevMusic
@@ -212,14 +228,16 @@ Rectangle {
                     background: Rectangle {
                         x: _songLine.leftPadding
                         y: _songLine.topPadding + _songLine.availableHeight / 2 - height / 2
+
                         implicitWidth: 200
                         implicitHeight: 4
                         width: _songLine.availableWidth
                         height: implicitHeight
                         radius: 2
                         color: "#bdbebf"
-
+                        z: 1
                         Rectangle {
+                            z: 2
                             width: _songLine.visualPosition * parent.width
                             height: parent.height
                             color: Material.color(Material.Brown, Material.Shade400)
@@ -229,6 +247,7 @@ Rectangle {
                     handle: Rectangle {
                         x: _songLine.leftPadding + _songLine.visualPosition * (_songLine.availableWidth - width)
                         y: _songLine.topPadding + _songLine.availableHeight / 2 - height * 0.75
+                        z: 99
                         implicitWidth: 4
                         implicitHeight: 10
                         color: Material.color(Material.Brown)
@@ -240,6 +259,17 @@ Rectangle {
                         if (isSongPlaying)
                             _player.play()
 
+                    }
+                    BaseText {
+                        x: 0
+                        y: 0 - implicitHeight
+                        text: "%1:%2".arg(currMinute).arg(convertSecondsToText(currSecond))
+                    }
+                    BaseText {
+                        x: _songLine.width - implicitWidth
+                        y: 0 - implicitHeight
+                        text: "-%1:%2".arg(minutesLeftUntilToTheEnd)
+                                     .arg(convertSecondsToText(secondsLeftUntilToTheEnd))
                     }
                 }
             }

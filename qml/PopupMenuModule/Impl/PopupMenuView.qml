@@ -4,11 +4,6 @@ import QtQuick.Controls.Material 2.12
 
 Menu {
 
-
-    Rectangle {
-        height: 3
-        color: "transparent"
-    }
     Action {
         id: _addAction
         text: qsTr("Додати пісні")
@@ -22,10 +17,6 @@ Menu {
         text: qsTr("Видалити пісню")
         onTriggered: {
             var currentIndex = _songsList.currentIndex
-//            if (currentIndex === audioPlayer.currentSongIndex) {
-//                _player.stop()
-//                audioPlayer.currentSongIndex = -1
-//            }
             _audioPlayerController.deleteSong(currentIndex)
         }
     }
@@ -47,11 +38,6 @@ Menu {
         onTriggered: {
             Qt.quit()
         }
-    }
-
-    Rectangle {
-        height: 3
-        color: "transparent"
     }
 
     delegate: PopupMenuDelegate { }
