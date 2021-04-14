@@ -13,7 +13,9 @@ Rectangle {
         Rectangle {
             id: _qwer
             width: _songsList.width; height: 40
-            color: "lightsteelblue"
+            color: (Material.theme === Material.Dark)
+                   ? Material.color(Material.Pink, Material.Shade100)
+                   : Material.color(Material.LightBlue, Material.Shade200)
             radius: 5
             y: _songsList.currentItem ? _songsList.currentItem.y : _qwer.y
             Behavior on y {
@@ -30,6 +32,7 @@ Rectangle {
     ScrollView {
         id: _scrollView
         anchors.fill: _songsListBackground
+        z: 99
         clip: true
 
         ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
@@ -74,8 +77,11 @@ Rectangle {
     }
 
     Rectangle {
+        z: 1
         id: _songsListBackground
-        color: Material.color(Material.Lime)
+        color: (Material.theme === Material.Light)
+               ? Material.color(Material.Lime, Material.Shade200)
+               : Material.color(Material.DeepPurple, Material.Shade200)
         opacity: 0.25
         radius: 5
         anchors.fill: root

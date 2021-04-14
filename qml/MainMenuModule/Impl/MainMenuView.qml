@@ -25,6 +25,14 @@ MenuBar {
                 _audioPlayerController.downloadJsonData()
             }
         }
+        Action {
+            id: _changeTheme
+            text: qsTr("Змінити тему")
+            onTriggered: {
+                _changeThemeDialog.open()
+            }
+        }
+
         MenuSeparator {
             id: _separator
             objectName: "separator"

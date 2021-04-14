@@ -2,6 +2,7 @@ import QtQuick 2.0
 import QtMultimedia 5.15
 import QtQuick.Dialogs 1.3
 import QtQuick.Controls.Material 2.12
+import QtQuick.Controls 2.15
 import Player 1.0
 import PlayBarModule.Impl 1.0
 import MainMenuModule.Impl 1.0
@@ -79,6 +80,39 @@ Rectangle {
         }
         onRejected: {
             console.log("Canceled")
+        }
+    }
+
+    Dialog {
+        id: _changeThemeDialog
+
+        title: qsTr("Змінити тему")
+        standardButtons: Dialog.Apply | Dialog.Cancel
+        x: (_mainWindow.width - _changeThemeDialog.width) / 2
+        y: (_mainWindow.height - _changeThemeDialog.height) / 2
+
+        contentItem: Rectangle {
+            color: "transparent"
+            ButtonGroup {
+                id: _btnGroup
+                buttons: _columnOfRadioBtn.children
+            }
+
+            Column {
+                id: _columnOfRadioBtn
+                anchors.left: parent.left
+
+                RadioButton { text: qsTr("Dark") }
+                RadioButton { text: qsTr("Light");  checked: true }
+            }
+        }
+
+        onApplied: {
+            var checkedBtn = _btnGroup.checkedButton
+            if (checkedBtn.text === "Light")
+                _mainWindow.Material.theme = Material.Light
+            else if (checkedBtn.text === "Dark")
+                _mainWindow.Material.theme = Material.Dark
         }
     }
 }

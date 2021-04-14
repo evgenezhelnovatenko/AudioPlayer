@@ -20,7 +20,17 @@ Rectangle {
     }
 
     id: root
-    gradient: Gradient {
+
+    color: (Material.theme === Material.Dark)
+           ? Material.color(Material.BlueGrey, Material.Shade400)
+           : ""
+
+    gradient: (Material.theme === Material.Light)
+              ? _playbarGradient
+              : ""
+
+    Gradient {
+        id: _playbarGradient
         GradientStop { position: 0.0; color: Material.color(Material.Yellow) }
         GradientStop { position: 1.0; color: Material.color(Material.DeepOrange, Material.ShadeA100) }
     }
@@ -139,7 +149,6 @@ Rectangle {
 
                     Layout.alignment: Qt.AlignCenter
 
-
                     background: Rectangle {
                         x: _songVolume.leftPadding
                         y: _songVolume.topPadding + _songVolume.availableHeight / 2 - height / 2
@@ -148,12 +157,15 @@ Rectangle {
                         width: _songVolume.availableWidth
                         height: implicitHeight
                         radius: 2
-                        color: Material.color(Material.Grey)
-
+                        color: (Material.theme === Material.Dark)
+                               ? Material.color(Material.Grey, Material.Shade200)
+                               : Material.color(Material.Grey)
                         Rectangle {
                             width: _songVolume.visualPosition * parent.width
                             height: parent.height
-                            color: Material.color(Material.Brown)
+                            color: (Material.theme === Material.Dark)
+                                   ? Material.color(Material.Pink, Material.Shade100)
+                                   : Material.color(Material.Brown)
                             radius: 2
                         }
                     }
@@ -180,7 +192,9 @@ Rectangle {
             Layout.preferredHeight: 40
             Layout.alignment: Qt.AlignHCenter
 
-            color: Material.color(Material.DeepOrange, Material.ShadeA100)
+            color: (Material.theme === Material.Dark)
+                   ? Material.color(Material.Gray, Material.Shade100)
+                   : Material.color(Material.DeepOrange, Material.ShadeA100)
         }
 
         Rectangle {
