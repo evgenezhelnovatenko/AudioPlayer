@@ -15,13 +15,7 @@ ApplicationWindow {
 
     Material.theme: Material.Light
 
-    Material.accent: Material.Indigo
-
-    property string playIcoSource: "/qml/resources/img/svg/music_player_play_icon.svg"
-    property string pauseIcoSource: "/qml/resources/img/svg/music_player_pause_icon.svg"
-    property string prevOrNextSoundIcoSource: "/qml/resources/img/svg/next_sound_arrow_icon_123825.svg"
-    property string volumeIcoSource: "/qml/resources/img/svg/volume_control_sound_icon_.svg"
-    property string noneSongImageImgSource: "/qml/resources/img/songImageNotFoundImg.jpg"
+    Material.accent: Material.Pink
 
     Player {
         id: _mainInteface

@@ -64,7 +64,6 @@ Rectangle {
             anchors.margins: 20
             width: root.width
             height: root.height - (_playbar.height + _mainMenu.height)
-
         }
     }
 

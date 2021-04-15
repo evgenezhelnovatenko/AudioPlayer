@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.12
+import ResourceProvider 1.0
 
 Rectangle {
     id: root
@@ -28,7 +29,7 @@ Rectangle {
                 id: _songPlaying
                 width: 20
                 height: 20
-                source: volumeIcoSource
+                source: Resources.songsList.volumeSoundIco
                 fillMode: Image.PreserveAspectFit
 
                 visible: audioPlayer.currentSongIndex === index ? true : false

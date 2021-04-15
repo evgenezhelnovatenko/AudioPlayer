@@ -25,5 +25,9 @@
         <file>qml/resources/img/songImageNotFoundImg.jpg</file>
         <file>qml/PlayBarModule/Base/qmldir</file>
         <file>qml/PlayBarModule/Base/BaseText.qml</file>
+        <file>qml/resources/img/svg/loop_icon.svg</file>
+        <file>qml/resources/img/svg/shuffle_songs_icon.svg</file>
+        <file>qml/ResourceProvider/qmldir</file>
+        <file>qml/ResourceProvider/Resources.qml</file>
     </qresource>
 </RCC>

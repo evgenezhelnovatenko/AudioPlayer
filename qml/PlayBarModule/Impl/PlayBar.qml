@@ -3,6 +3,7 @@ import QtQuick.Layouts 1.15
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.12
+import ResourceProvider 1.0
 import PlayBarModule.Base 1.0
 
 Rectangle {
@@ -64,7 +65,7 @@ Rectangle {
                         Image {
                             width: parent.width
                             height: parent.height
-                            source: prevOrNextSoundIcoSource
+                            source: Resources.playbar.prevOrNextSoundIco
                             mirror: true
                             fillMode: Image.PreserveAspectFit
                         }
@@ -89,8 +90,8 @@ Rectangle {
                         Image {
                             width: parent.width
                             height: parent.height
-                            source: isSongPlaying ? pauseIcoSource
-                                                  : playIcoSource
+                            source: isSongPlaying ? Resources.playbar.pauseIco
+                                                  : Resources.playbar.playIco
                             fillMode: Image.PreserveAspectFit
                         }
 
@@ -122,7 +123,7 @@ Rectangle {
                         Image {
                             width: parent.width
                             height: parent.height
-                            source: prevOrNextSoundIcoSource
+                            source: Resources.playbar.prevOrNextSoundIco
                             fillMode: Image.PreserveAspectFit
                         }
 
@@ -193,7 +194,7 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter
 
             color: (Material.theme === Material.Dark)
-                   ? Material.color(Material.Gray, Material.Shade100)
+                   ? Material.color(Material.Pink, Material.Shade100)
                    : Material.color(Material.DeepOrange, Material.ShadeA100)
         }
 
@@ -224,70 +225,133 @@ Rectangle {
                         id: _noneSongImg
                         width: parent.width
                         height: parent.height
-                        source: noneSongImageImgSource
+                        source: Resources.playbar.noneSongImageImg
                         fillMode: Image.PreserveAspectFit
                         visible: true
                     }
                 }
 
-                Slider {
-                    id: _songLine
-                    from: 1
-                    value: _player.position / 1000
-                    to: _player.duration / 1000
-
+                Rectangle {
                     Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignBottom
+                    Layout.fillHeight: true
 
-                    background: Rectangle {
-                        x: _songLine.leftPadding
-                        y: _songLine.topPadding + _songLine.availableHeight / 2 - height / 2
+                    color: "transparent"
 
-                        implicitWidth: 200
-                        implicitHeight: 4
-                        width: _songLine.availableWidth
-                        height: implicitHeight
-                        radius: 2
-                        color: "#bdbebf"
-                        z: 1
-                        Rectangle {
-                            z: 2
-                            width: _songLine.visualPosition * parent.width
-                            height: parent.height
-                            color: Material.color(Material.Brown, Material.Shade400)
+                    Slider {
+                        id: _songLine
+                        height: 15
+                        from: 1
+                        value: _player.position / 1000
+                        to: _player.duration / 1000
+
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+
+                        background: Rectangle {
+                            x: _songLine.leftPadding
+                            y: _songLine.topPadding + _songLine.availableHeight / 2 - height / 2
+
+                            implicitWidth: 200
+                            implicitHeight: 4
+                            width: _songLine.availableWidth
+                            height: implicitHeight
                             radius: 2
+                            color: "#bdbebf"
+                            z: 1
+                            Rectangle {
+                                z: 2
+                                width: _songLine.visualPosition * parent.width
+                                height: parent.height
+                                color: Material.color(Material.Brown, Material.Shade400)
+                                radius: 2
+                            }
+                        }
+                        handle: Rectangle {
+                            x: _songLine.leftPadding + _songLine.visualPosition * (_songLine.availableWidth - width)
+                            y: _songLine.topPadding + _songLine.availableHeight / 2 - height * 0.75
+                            z: 99
+                            implicitWidth: 4
+                            implicitHeight: 10
+                            color: Material.color(Material.Brown)
+                        }
+
+                        onMoved: {
+                            _player.stop()
+                            _player.seek(_songLine.value * 1000)
+                            if (isSongPlaying)
+                                _player.play()
+
+                        }
+                        BaseText {
+                            id: _currSongTime
+                            x: 0
+                            y: 0 - implicitHeight
+                            text: "%1:%2".arg(currMinute).arg(convertSecondsToText(currSecond))
+                        }
+                        BaseText {
+                            id: _leftSongTime
+                            x: _songLine.width - implicitWidth
+                            y: 0 - implicitHeight
+                            text: "-%1:%2".arg(minutesLeftUntilToTheEnd).arg(convertSecondsToText(secondsLeftUntilToTheEnd))
                         }
                     }
-                    handle: Rectangle {
-                        x: _songLine.leftPadding + _songLine.visualPosition * (_songLine.availableWidth - width)
-                        y: _songLine.topPadding + _songLine.availableHeight / 2 - height * 0.75
-                        z: 99
-                        implicitWidth: 4
-                        implicitHeight: 10
-                        color: Material.color(Material.Brown)
-                    }
+                    Rectangle {
+                        id: _shuffleSongs
+                        width: 30
+                        height: 25
+                        x: 45
+                        y: 5
+                        color: "transparent"
+                        radius: 5
+                        opacity: 0.75
+                        Image {
+                            id: _shuffleSongsImg
+                            anchors.fill: parent
+                            anchors.leftMargin: 5
+                            anchors.rightMargin: 5
+                            anchors.topMargin: 2
+                            anchors.bottomMargin: 2
+                            fillMode: Image.PreserveAspectCrop
+                            source: Resources.playbar.shuffleSongsIco
+                        }
+                        MouseArea {
+                            anchors.fill: parent
 
-                    onMoved: {
-                        _player.stop()
-                        _player.seek(_songLine.value * 1000)
-                        if (isSongPlaying)
-                            _player.play()
+                            onClicked: {
+                                _shuffleSongs.color = Material.color(Material.BlueGrey, Material.Shade400)
+                            }
+                        }
+                    }
+                    Rectangle {
+                        id: _loopSong
+                        width: 30
+                        height: 25
+                        x: parent.width - (_loopSong.width + _shuffleSongs.x)
+                        y: 5
+                        color: "transparent"
+                        radius: 5
+                        opacity: 0.75
+                        Image {
+                            id: _loopSongImg
+                            anchors.fill: parent
+                            anchors.leftMargin: 5
+                            anchors.rightMargin: 5
+                            anchors.topMargin: 2
+                            anchors.bottomMargin: 2
+                            fillMode: Image.PreserveAspectCrop
+                            source: Resources.playbar.loopIco
+                        }
+                        MouseArea {
+                            anchors.fill: parent
 
-                    }
-                    BaseText {
-                        x: 0
-                        y: 0 - implicitHeight
-                        text: "%1:%2".arg(currMinute).arg(convertSecondsToText(currSecond))
-                    }
-                    BaseText {
-                        x: _songLine.width - implicitWidth
-                        y: 0 - implicitHeight
-                        text: "-%1:%2".arg(minutesLeftUntilToTheEnd)
-                                     .arg(convertSecondsToText(secondsLeftUntilToTheEnd))
+                            onClicked: {
+                                _loopSong.color = Material.color(Material.BlueGrey, Material.Shade400)
+                            }
+                        }
                     }
                 }
             }
-
         }
         Rectangle {
             Layout.fillHeight: true
@@ -297,4 +361,5 @@ Rectangle {
             color: "transparent"
         }
     }
+
 }
