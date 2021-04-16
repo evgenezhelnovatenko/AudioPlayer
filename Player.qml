@@ -105,6 +105,8 @@ Rectangle {
                 RadioButton { text: qsTr("Light");  checked: true }
             }
         }
+//        Material.background: Material.Lime
+//        Material.foreground: Material.Pink
 
         onApplied: {
             var checkedBtn = _btnGroup.checkedButton

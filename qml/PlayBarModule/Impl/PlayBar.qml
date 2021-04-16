@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Layouts 1.15
 import QtQuick 2.15
+import QtMultimedia 5.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.12
 import ResourceProvider 1.0
@@ -11,6 +12,8 @@ Rectangle {
     property int currSecond: _player.position / 1000 % 60
     property int minutesLeftUntilToTheEnd: (_player.duration - _player.position) / 60000
     property int secondsLeftUntilToTheEnd: (_player.duration - _player.position) / 1000 % 60
+    property bool isLoop: false
+    property bool isShuffle: false
 
     function convertSecondsToText(seconds) {
         var secondsAbs = Math.abs(seconds)
@@ -263,7 +266,9 @@ Rectangle {
                                 z: 2
                                 width: _songLine.visualPosition * parent.width
                                 height: parent.height
-                                color: Material.color(Material.Brown, Material.Shade400)
+                                color: (Material.theme === Material.Dark)
+                                       ? Material.color(Material.Pink, Material.Shade100)
+                                       : Material.color(Material.Brown, Material.Shade400)
                                 radius: 2
                             }
                         }
@@ -302,7 +307,10 @@ Rectangle {
                         height: 25
                         x: 45
                         y: 5
-                        color: "transparent"
+                        color: isShuffle ? (Material.theme === Material.Dark)
+                                        ? Material.color(Material.Pink, Material.Shade100)
+                                        : Material.color(Material.BlueGrey, Material.Shade400)
+                                      : "transparent"
                         radius: 5
                         opacity: 0.75
                         Image {
@@ -319,7 +327,13 @@ Rectangle {
                             anchors.fill: parent
 
                             onClicked: {
-                                _shuffleSongs.color = Material.color(Material.BlueGrey, Material.Shade400)
+                                if (!isShuffle) {
+                                    /* shuffle ON */
+                                    isShuffle = true
+                                } else {
+                                    /* shuffle OFF */
+                                    isShuffle = false
+                                }
                             }
                         }
                     }
@@ -329,7 +343,10 @@ Rectangle {
                         height: 25
                         x: parent.width - (_loopSong.width + _shuffleSongs.x)
                         y: 5
-                        color: "transparent"
+                        color: isLoop ? (Material.theme === Material.Dark)
+                                        ? Material.color(Material.Pink, Material.Shade100)
+                                        : Material.color(Material.BlueGrey, Material.Shade400)
+                                      : "transparent"
                         radius: 5
                         opacity: 0.75
                         Image {
@@ -346,7 +363,14 @@ Rectangle {
                             anchors.fill: parent
 
                             onClicked: {
-                                _loopSong.color = Material.color(Material.BlueGrey, Material.Shade400)
+                                if (!isLoop) {
+                                    _player.loops = Audio.Infinite
+                                    isLoop = true
+                                }
+                                else {
+                                    _player.loops = 0
+                                    isLoop = false
+                                }
                             }
                         }
                     }
