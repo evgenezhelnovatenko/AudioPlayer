@@ -10,12 +10,14 @@
 #include <QJsonValue>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <algorithm>
+#include <random>
 
 #include "audioplayer.h"
 
 AudioPlayer::AudioPlayer(QObject *parent)
     : QAbstractListModel {parent}
-    , m_currentSongIndex (0)
+    , indexOfIndices (0)
     , mySongsFile (new QFile(this))
     , reply (nullptr)
     , file (nullptr)
@@ -30,8 +32,9 @@ AudioPlayer::AudioPlayer(QObject *parent)
         return;
     }
 
-    m_filepath = m_playlist[m_currentSongIndex];
-
+    indices.resize(m_playlist.size());
+    fillingTheVectorOfIndices();
+    m_currentSongIndex = indices[indexOfIndices];
 
     connect(this, &AudioPlayer::newSongsListChanged, this, &AudioPlayer::addNewSongs);
 
@@ -48,6 +51,14 @@ AudioPlayer::~AudioPlayer()
     delete mySongsFile;
 }
 
+QHash<int, QByteArray> AudioPlayer::roleNames() const
+{
+    QHash<int, QByteArray> roles;
+    roles[AudioPlayerRoles::SourceRole] = "source";
+
+    return roles;
+}
+
 int AudioPlayer::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
@@ -56,7 +67,7 @@ int AudioPlayer::rowCount(const QModelIndex &parent) const
 
 QVariant AudioPlayer::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || role != Qt::DisplayRole) {
+    if (!index.isValid() || index.row() > rowCount(index)) {
         return {};
     }
 
@@ -69,16 +80,16 @@ QVariant AudioPlayer::data(const QModelIndex &index, int role) const
     return QVariant::fromValue(m_playlist[index_row]);
 }
 
-void AudioPlayer::switchToNextSong()
+void AudioPlayer::changeIndexToNext()
 {
-    m_currentSongIndex++;
-    songChange();
+    indexOfIndices++;
+    changeCurrentSongIndex();
 }
 
-void AudioPlayer::switchToPrevSong()
+void AudioPlayer::changeIndexToPrevious()
 {
-    m_currentSongIndex--;
-    songChange();
+    indexOfIndices--;
+    changeCurrentSongIndex();
 }
 
 void AudioPlayer::setCurrentSongIndex(int index)
@@ -100,13 +111,18 @@ void AudioPlayer::setnewSongsList(QList<QUrl> newSongsList)
     m_newSongsList.clear();
 }
 
-void AudioPlayer::setFilepath(QString filepath)
+void AudioPlayer::setIndexOfIndices(int songIndex)
 {
-    if (m_filepath == filepath)
+    if (!isPositionValid(songIndex)) {
         return;
+    }
 
-    m_filepath = filepath;
-    emit filepathChanged(m_filepath);
+    for (size_t i = 0; i < indices.size(); i++) {
+        if (indices[i] == static_cast<size_t>(songIndex)) {
+            indexOfIndices = i;
+            return;
+        }
+    }
 }
 
 void AudioPlayer::addNewSongs()
@@ -123,8 +139,11 @@ void AudioPlayer::addNewSongs()
         QString newSong = m_newSongsList.at(i).toLocalFile();
         out << newSong << "\n";
         m_playlist.push_back(newSong);
+        indices.push_back(indices.size());
     }
     endInsertRows();
+
+    shuffleSongsIndices();
 
     mySongsFile->close();
 
@@ -138,16 +157,50 @@ void AudioPlayer::deleteSong(int songIndex)
     m_playlist.erase(it);
     endRemoveRows();
 
+    indices.pop_back();
     dubbingToSongsFile();
 
     if (songIndex < m_currentSongIndex) {
-        m_currentSongIndex--;
+        indexOfIndices--;
+        m_currentSongIndex = indices[indexOfIndices];
         emit currentSongIndexChanged(m_currentSongIndex);
     } else if (songIndex == m_currentSongIndex) {
         m_currentSongIndex = -1;
+        indexOfIndices = -1;
         emit currentSongIndexChanged(m_currentSongIndex);
         emit stopThePlayer();
     }
+}
+
+void AudioPlayer::shuffleSongsIndices()
+{
+    static auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::mt19937 generator(seed);
+
+    indices.erase(indices.begin() + indexOfIndices);
+    std::shuffle(indices.begin(), indices.end(), generator);
+    indices.insert(indices.begin(), m_currentSongIndex);
+    indexOfIndices = 0;
+}
+
+void AudioPlayer::sortSongsIndices()
+{
+    indexOfIndices = indices[indexOfIndices];
+
+    std::sort(indices.begin(), indices.end());
+}
+
+QList<QUrl> AudioPlayer::playlist()
+{
+    QList<QUrl> playlist;
+
+    for (size_t i = 0; i < indices.size(); i++) {
+        size_t index = indices.at(i);
+        QUrl songUrl = QUrl::fromLocalFile(m_playlist.at(index));
+        playlist.append(songUrl);
+    }
+
+    return playlist;
 }
 
 void AudioPlayer::downloadJsonData()
@@ -275,7 +328,7 @@ void AudioPlayer::slotAuthenticationRequired(QNetworkReply *, QAuthenticator *au
 
 bool AudioPlayer::isPositionValid(const size_t position) const
 {
-    return (position < m_playlist.size() && position >= 0);
+    return (position < indices.size() && position >= 0);
 }
 
 bool AudioPlayer::readingSongsFromMySongsFile() // Зчитування списку пісень з файлу та запис їх у m_playlist.
@@ -296,17 +349,17 @@ bool AudioPlayer::readingSongsFromMySongsFile() // Зчитування спис
     return true;
 }
 
-void AudioPlayer::songChange()
+void AudioPlayer::changeCurrentSongIndex()
 {
-    if (!isPositionValid(m_currentSongIndex)) {
+    if (!isPositionValid(indexOfIndices)) {
         emit stopThePlayer();
+        indexOfIndices = -1;
         m_currentSongIndex = -1;
         emit currentSongIndexChanged(m_currentSongIndex);
         return;
     }
-    m_filepath = m_playlist[m_currentSongIndex];
+    m_currentSongIndex = indices[indexOfIndices];
     emit currentSongIndexChanged(m_currentSongIndex);
-    emit filepathChanged(m_filepath);
 }
 
 void AudioPlayer::dubbingToSongsFile()
@@ -323,6 +376,13 @@ void AudioPlayer::dubbingToSongsFile()
     }
 
     mySongsFile->close();
+}
+
+void AudioPlayer::fillingTheVectorOfIndices()
+{
+    for (size_t i = 0; i < indices.size(); i++) {
+        indices[i] = i;
+    }
 }
 
 #ifndef QT_NO_SSL

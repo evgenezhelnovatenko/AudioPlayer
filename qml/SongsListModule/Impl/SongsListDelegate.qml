@@ -11,7 +11,7 @@ Rectangle {
     color: "transparent"
 
     function getFileName () {
-        var arr = display.split('/');
+        var arr = source.split('/');
         return arr[arr.length - 1];
     }
 
@@ -60,10 +60,15 @@ Rectangle {
         }
 
         onDoubleClicked: {
-            audioPlayer.currentSongIndex = index
-            _audioPlayerController.songChange()
-            isSongPlaying = true
-            _player.play()
+            _audioPlayerController.setIndexOfIndices(index)
+            _audioPlayerController.changeCurrentSongIndex()
+            _player.playlist.currentIndex = audioPlayer.currentSongIndex
+
+            if (isShuffle)
+                _audioPlayerController.shuffleSongs()
+
+//            isSongPlaying = true
+//            _player.play()
         }
 
     }

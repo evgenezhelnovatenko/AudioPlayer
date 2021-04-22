@@ -12,8 +12,6 @@ Rectangle {
     property int currSecond: _player.position / 1000 % 60
     property int minutesLeftUntilToTheEnd: (_player.duration - _player.position) / 60000
     property int secondsLeftUntilToTheEnd: (_player.duration - _player.position) / 1000 % 60
-    property bool isLoop: false
-    property bool isShuffle: false
 
     function convertSecondsToText(seconds) {
         var secondsAbs = Math.abs(seconds)
@@ -64,6 +62,7 @@ Rectangle {
                         width: 20
                         height: 20
                         color: "transparent"
+                        enabled: audioPlayer.currentSongIndex === -1 ? false : true
 
                         Image {
                             width: parent.width
@@ -78,9 +77,8 @@ Rectangle {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
                             onClicked:  {
-                                _audioPlayerController.switchToPrevSong()
-                                if (isSongPlaying)
-                                    _player.play()
+                                _audioPlayerController.changeIndexToPrevious()
+                                _player.playlist.previous()
                             }
                         }
                     }
@@ -99,7 +97,7 @@ Rectangle {
                         }
 
                         MouseArea {
-                            id: playArea
+                            id: _playOrPauseArea
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
                             onClicked:  {
@@ -118,7 +116,7 @@ Rectangle {
                         }
                     }
                     Rectangle {
-                        id: nextMusic
+                        id: _nextMusic
                         width: 20
                         height: 20
                         color: "transparent"
@@ -131,13 +129,12 @@ Rectangle {
                         }
 
                         MouseArea {
-                            id: nextArea
+                            id: _nextArea
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
                             onClicked:  {
-                                _audioPlayerController.switchToNextSong()
-                                if (isSongPlaying)
-                                    _player.play()
+                                _audioPlayerController.changeIndexToNext()
+                                _player.playlist.next()
                             }
                         }
                     }
@@ -146,7 +143,7 @@ Rectangle {
                 Slider {
                     id: _songVolume
                     width: 200
-                    from: 1
+                    from: 0
                     value: 70
                     to: 100
 
@@ -308,9 +305,9 @@ Rectangle {
                         x: 45
                         y: 5
                         color: isShuffle ? (Material.theme === Material.Dark)
-                                        ? Material.color(Material.Pink, Material.Shade100)
-                                        : Material.color(Material.BlueGrey, Material.Shade400)
-                                      : "transparent"
+                                           ? Material.color(Material.Pink, Material.Shade100)
+                                           : Material.color(Material.BlueGrey, Material.Shade400)
+                                         : "transparent"
                         radius: 5
                         opacity: 0.75
                         Image {
@@ -318,9 +315,9 @@ Rectangle {
                             anchors.fill: parent
                             anchors.leftMargin: 5
                             anchors.rightMargin: 5
-                            anchors.topMargin: 2
-                            anchors.bottomMargin: 2
-                            fillMode: Image.PreserveAspectCrop
+                            anchors.topMargin: 3
+                            anchors.bottomMargin: 3
+                            fillMode: Image.PreserveAspectFit
                             source: Resources.playbar.shuffleSongsIco
                         }
                         MouseArea {
@@ -328,11 +325,14 @@ Rectangle {
 
                             onClicked: {
                                 if (!isShuffle) {
-                                    /* shuffle ON */
+//                                    _player.playlist.removeItems(0, _player.playlist.currentIndex - 1)
+//                                    _player.playlist.removeItems(_player.playlist.currentIndex + 1, _player.playlist.itemCount - 1)
+
                                     isShuffle = true
+                                    _audioPlayerController.shuffleSongs()
                                 } else {
-                                    /* shuffle OFF */
                                     isShuffle = false
+                                    _audioPlayerController.sortSongs()
                                 }
                             }
                         }

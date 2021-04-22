@@ -12,6 +12,8 @@ Rectangle {
 
     property bool isSongPlaying: false
     property var audioPlayer: _audioPlayerController.getModel()
+    property bool isLoop: false
+    property bool isShuffle: false
 
     id: root
 
@@ -20,30 +22,51 @@ Rectangle {
 
         onStopPlayingMusic: {
             isSongPlaying = false
-            _player.stop();
+            _player.stop()
             audioPlayer.filepath = ""
         }
         onModelHasBeenChanged: {
             audioPlayer = _audioPlayerController.getModel()
         }
-    }
+        onPlaylistHasBeenChanged: {
 
-    Audio {
-        id: _player
-        source: audioPlayer.filepath
-        volume: 0.7
+            var playlist = _audioPlayerController.getPlaylist()
+            _player.playlist.clear()
+            _player.playlist.addItems(playlist)
 
-        onPlaybackStateChanged: {
-            if (playbackState === Audio.StoppedState) {
-                if (_player.position === _player.duration) {
-                    _audioPlayerController.switchToNextSong()
-                    if (isSongPlaying)
-                        _player.play()
-                }
+            if (isShuffle) {
+                _player.playlist.currentIndex = 0
+            } else {
+                _player.playlist.currentIndex = audioPlayer.currentSongIndex
             }
         }
     }
 
+    Audio {
+        id: _player
+        audioRole: Audio.MusicRole
+        playlist: _playlist
+        volume: 0.7
+        autoLoad: true
+        onPlaybackStateChanged: { // Цей сигнал оброблюється для того щоб, коли пісня дійде кінця, вона переключилася
+                                  // на наступну.
+            if (playbackState === Audio.StoppedState) {
+                if (_player.duration !== 0) { // Ця умова для того щоб не при _player.duration = 0 програма не заходила у цей if.
+                                              // Бо _player.position також буде дорівнювати 0.
+                    if (_player.position === _player.duration) {
+                        _audioPlayerController.changeIndexToNext()
+                    }
+                }
+                console.log("kykyky")
+            }
+        }
+
+        Component.onCompleted: {
+            _player.playlist.addItems(_audioPlayerController.getPlaylist())
+            _player.playlist.currentIndex = 0
+        }
+
+    }
 
     Column {
 
@@ -64,6 +87,17 @@ Rectangle {
             anchors.margins: 20
             width: root.width
             height: root.height - (_playbar.height + _mainMenu.height)
+        }
+    }
+
+    Playlist {
+        id: _playlist
+        currentIndex: audioPlayer.currentSongIndex
+
+        onCurrentIndexChanged: {
+
+            if (isSongPlaying)
+                _player.play()
         }
     }
 
@@ -105,8 +139,6 @@ Rectangle {
                 RadioButton { text: qsTr("Light");  checked: true }
             }
         }
-//        Material.background: Material.Lime
-//        Material.foreground: Material.Pink
 
         onApplied: {
             var checkedBtn = _btnGroup.checkedButton
