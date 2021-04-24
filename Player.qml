@@ -23,7 +23,6 @@ Rectangle {
         onStopPlayingMusic: {
             isSongPlaying = false
             _player.stop()
-            audioPlayer.filepath = ""
         }
         onModelHasBeenChanged: {
             audioPlayer = _audioPlayerController.getModel()
@@ -31,14 +30,27 @@ Rectangle {
         onPlaylistHasBeenChanged: {
 
             var playlist = _audioPlayerController.getPlaylist()
-            _player.playlist.clear()
-            _player.playlist.addItems(playlist)
+            var itemCount = _player.playlist.itemCount
+            showPlaylist()
+            _player.playlist.insertItems(0, playlist)
+            showPlaylist()
+            _player.playlist.removeItems(itemCount, _player.playlist.itemCount - 1)
+            showPlaylist()
 
-            if (isShuffle) {
-                _player.playlist.currentIndex = 0
-            } else {
-                _player.playlist.currentIndex = audioPlayer.currentSongIndex
+            console.log(_player.playlist.currentIndex + "; " + audioPlayer.currentSongIndex)
+
+//            if (isShuffle) {
+//                _player.playlist.currentIndex = 0
+//            } else {
+//                _player.playlist.currentIndex = audioPlayer.currentSongIndex
+//            }
+        }
+
+        function showPlaylist() {
+            for (var i = 0; i < _player.playlist.itemCount; i++) {
+                console.log(_player.playlist.itemSource(i))
             }
+            console.log("----------------------------------------------")
         }
     }
 
@@ -63,7 +75,6 @@ Rectangle {
 
         Component.onCompleted: {
             _player.playlist.addItems(_audioPlayerController.getPlaylist())
-            _player.playlist.currentIndex = 0
         }
 
     }
@@ -95,9 +106,12 @@ Rectangle {
         currentIndex: audioPlayer.currentSongIndex
 
         onCurrentIndexChanged: {
-
+            console.log("currentIndex: " + currentIndex)
             if (isSongPlaying)
                 _player.play()
+        }
+        onItemRemoved: {
+
         }
     }
 

@@ -17,7 +17,7 @@
 
 AudioPlayer::AudioPlayer(QObject *parent)
     : QAbstractListModel {parent}
-    , indexOfIndices (0)
+    , indexOfIndices (-1)
     , mySongsFile (new QFile(this))
     , reply (nullptr)
     , file (nullptr)
@@ -34,7 +34,7 @@ AudioPlayer::AudioPlayer(QObject *parent)
 
     indices.resize(m_playlist.size());
     fillingTheVectorOfIndices();
-    m_currentSongIndex = indices[indexOfIndices];
+    m_currentSongIndex = -1;
 
     connect(this, &AudioPlayer::newSongsListChanged, this, &AudioPlayer::addNewSongs);
 
@@ -111,18 +111,28 @@ void AudioPlayer::setnewSongsList(QList<QUrl> newSongsList)
     m_newSongsList.clear();
 }
 
-void AudioPlayer::setIndexOfIndices(int songIndex)
+void AudioPlayer::setIndexOfIndices(int indexOfIndices)
+{
+    if (!isPositionValid(indexOfIndices)) {
+        return;
+    }
+
+    this->indexOfIndices = indexOfIndices;
+}
+
+int AudioPlayer::calculateIndexOfIndices(int songIndex)
 {
     if (!isPositionValid(songIndex)) {
-        return;
+        return -1;
     }
 
     for (size_t i = 0; i < indices.size(); i++) {
         if (indices[i] == static_cast<size_t>(songIndex)) {
-            indexOfIndices = i;
-            return;
+            return i;
         }
     }
+
+    return -1;
 }
 
 void AudioPlayer::addNewSongs()
@@ -151,18 +161,25 @@ void AudioPlayer::addNewSongs()
 
 void AudioPlayer::deleteSong(int songIndex)
 {
-    std::vector<QString>::const_iterator it;
-    it = m_playlist.cbegin() + songIndex;
+    std::vector<QString>::const_iterator iteratorOfTheItemToRemoveFromPlaylist; // Ітератор елемента, що необхідно видалити з вектора m_playlist.
+    iteratorOfTheItemToRemoveFromPlaylist = m_playlist.cbegin() + songIndex;
+    std::vector<size_t>::const_iterator iteratorOfTheItemToRemoveFromIndices; // Ітератор елемента, що необхідно видалити з вектора indidces.
+    int indexOfTheItemToRemoveFromIndices = calculateIndexOfIndices(m_playlist.size() - 1); // Індекс елемента, що необхідно видалити з вектора indidces.
+    iteratorOfTheItemToRemoveFromIndices = indices.cbegin() + indexOfTheItemToRemoveFromIndices;
+
     beginRemoveRows(QModelIndex(), songIndex, songIndex);
-    m_playlist.erase(it);
+    m_playlist.erase(iteratorOfTheItemToRemoveFromPlaylist);
     endRemoveRows();
 
-    indices.pop_back();
+    indices.erase(iteratorOfTheItemToRemoveFromIndices);
+
     dubbingToSongsFile();
 
     if (songIndex < m_currentSongIndex) {
-        indexOfIndices--;
-        m_currentSongIndex = indices[indexOfIndices];
+//        indexOfIndices--;
+//        m_currentSongIndex = indices[indexOfIndices];
+        m_currentSongIndex--;
+        indexOfIndices = calculateIndexOfIndices(m_currentSongIndex);
         emit currentSongIndexChanged(m_currentSongIndex);
     } else if (songIndex == m_currentSongIndex) {
         m_currentSongIndex = -1;
@@ -185,7 +202,7 @@ void AudioPlayer::shuffleSongsIndices()
 
 void AudioPlayer::sortSongsIndices()
 {
-    indexOfIndices = indices[indexOfIndices];
+    indexOfIndices = m_currentSongIndex;
 
     std::sort(indices.begin(), indices.end());
 }

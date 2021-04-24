@@ -39,18 +39,19 @@ void AudioPlayerController::deleteSong(int songIndex)
 void AudioPlayerController::shuffleSongs()
 {
     player.shuffleSongsIndices();
-    emit playlistHasBeenChanged();
+//    emit playlistHasBeenChanged();
 }
 
 void AudioPlayerController::sortSongs()
 {
     player.sortSongsIndices();
-    emit playlistHasBeenChanged();
+//    emit playlistHasBeenChanged();
 }
 
 void AudioPlayerController::setIndexOfIndices(int songIndex)
 {
-    player.setIndexOfIndices(songIndex);
+    int indexOfIndices = player.calculateIndexOfIndices(songIndex);
+    player.setIndexOfIndices(indexOfIndices);
 }
 
 QList<QUrl> AudioPlayerController::getPlaylist()

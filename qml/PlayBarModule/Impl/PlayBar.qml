@@ -78,7 +78,8 @@ Rectangle {
                             cursorShape: Qt.PointingHandCursor
                             onClicked:  {
                                 _audioPlayerController.changeIndexToPrevious()
-                                _player.playlist.previous()
+                                console.log(_player.playlist.currentIndex + "; " + audioPlayer.currentSongIndex)
+//                                _player.playlist.previous()
                             }
                         }
                     }
@@ -134,7 +135,8 @@ Rectangle {
                             cursorShape: Qt.PointingHandCursor
                             onClicked:  {
                                 _audioPlayerController.changeIndexToNext()
-                                _player.playlist.next()
+                                console.log(_player.playlist.currentIndex + "; " + audioPlayer.currentSongIndex)
+//                                _player.playlist.next()
                             }
                         }
                     }
@@ -324,6 +326,7 @@ Rectangle {
                             anchors.fill: parent
 
                             onClicked: {
+                                console.log(_player.playlist.currentIndex + "; " + audioPlayer.currentSongIndex)
                                 if (!isShuffle) {
 //                                    _player.playlist.removeItems(0, _player.playlist.currentIndex - 1)
 //                                    _player.playlist.removeItems(_player.playlist.currentIndex + 1, _player.playlist.itemCount - 1)

@@ -17,6 +17,20 @@ Menu {
         text: qsTr("Видалити пісню")
         onTriggered: {
             var currentIndex = _songsList.currentIndex
+//            _audioPlayerController.showPlaylist()
+//            console.log(_playlist.currentIndex + "; " + audioPlayer.currentSongIndex)
+//            _player.playlist.moveItem(currentIndex, _player.playlist.currentIndex)
+//            _audioPlayerController.showPlaylist()
+//            _playlist.removeItem(_player.playlist.currentIndex + 1)
+//            console.log(_playlist.currentIndex + "; " + audioPlayer.currentSongIndex)
+//            _audioPlayerController.deleteSong(currentIndex)
+//            console.log(_playlist.currentIndex + "; " + audioPlayer.currentSongIndex)
+//            _audioPlayerController.showPlaylist()
+
+
+            console.log(_player.playlist.currentIndex + "; " + audioPlayer.currentSongIndex)
+            _player.playlist.removeItem(currentIndex)
+            console.log(_player.playlist.currentIndex + "; " + audioPlayer.currentSongIndex)
             _audioPlayerController.deleteSong(currentIndex)
         }
     }

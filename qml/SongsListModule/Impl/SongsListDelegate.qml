@@ -32,7 +32,7 @@ Rectangle {
                 source: Resources.songsList.volumeSoundIco
                 fillMode: Image.PreserveAspectFit
 
-                visible: audioPlayer.currentSongIndex === index ? true : false
+                visible: _player.playlist.currentIndex === index ? true : false
             }
         }
 
@@ -62,13 +62,12 @@ Rectangle {
         onDoubleClicked: {
             _audioPlayerController.setIndexOfIndices(index)
             _audioPlayerController.changeCurrentSongIndex()
-            _player.playlist.currentIndex = audioPlayer.currentSongIndex
 
             if (isShuffle)
                 _audioPlayerController.shuffleSongs()
 
-//            isSongPlaying = true
-//            _player.play()
+            isSongPlaying = true
+            _player.play()
         }
 
     }

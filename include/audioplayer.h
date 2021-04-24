@@ -47,12 +47,12 @@ public:
     QList<QUrl> playlist();
     void downloadJsonData();
     void startRequest(const QUrl &requestedUrl);
-
+    void setIndexOfIndices(int indexOfIndices); // Встановлення індексу вектора індексів.
+    int calculateIndexOfIndices(int songIndex);
 
 public slots:
     void setnewSongsList(QList<QUrl> newSongsList); // Зміна списку нової музики.
     void setCurrentSongIndex(int index); // Зміна поточного індексу музики.
-    void setIndexOfIndices(int songIndex); // Встановлення індексу вектора індексів.
 
 signals:
     void stopThePlayer();
