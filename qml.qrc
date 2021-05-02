@@ -29,5 +29,6 @@
         <file>qml/resources/img/svg/shuffle_songs_icon.svg</file>
         <file>qml/ResourceProvider/qmldir</file>
         <file>qml/ResourceProvider/Resources.qml</file>
+        <file>qml/resources/img/deleteSongImg.png</file>
     </qresource>
 </RCC>

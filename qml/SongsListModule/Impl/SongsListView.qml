@@ -56,8 +56,8 @@ Rectangle {
             Keys.onPressed: {
                 if ((event.key === Qt.Key_Enter) || (event.key === Qt.Key_Return)) {
 
-                    _songsList.model.currentSongIndex = _songsList.currentIndex
-                    _audioPlayerController.songChange()
+                    _audioPlayerController.setIndexOfIndices(_songsList.currentIndex)
+                    _audioPlayerController.changeCurrentSongIndex()
                     isSongPlaying = true;
                     _player.play()
                 }
@@ -86,6 +86,15 @@ Rectangle {
         radius: 5
         anchors.fill: root
         anchors.margins: 10
+    }
+
+    function deleteSong(index) {
+        var currentSongPosition = _player.position
+
+        _player.playlist.removeItem(index)
+        _audioPlayerController.deleteSong(index)
+
+        _player.seek(currentSongPosition)
     }
 
 }

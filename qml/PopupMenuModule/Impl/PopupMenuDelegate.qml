@@ -17,7 +17,7 @@ MenuItem {
                : "#000"
         horizontalAlignment: Text.AlignLeft
         verticalAlignment: Text.AlignVCenter
-        elide: Text.ElideRight
+//        elide: Text.ElideRight
     }
 
     background: Rectangle {

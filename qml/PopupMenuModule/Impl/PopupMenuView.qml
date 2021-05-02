@@ -5,7 +5,7 @@ import QtQuick.Controls.Material 2.12
 Menu {
 
     Action {
-        id: _addAction
+        id: _addSongsAction
         text: qsTr("Додати пісні")
         shortcut: "Ctrl+G"
         onTriggered: {
@@ -13,25 +13,13 @@ Menu {
         }
     }
     Action {
-        id: _getRequest
-        text: qsTr("Видалити пісню")
+        id: _deleteSongAction
+        text: qsTr(isEditModeEnabled ? "Режим редагування: Вимк." : "Режим редагування: Увімк.")
         onTriggered: {
-            var currentIndex = _songsList.currentIndex
-//            _audioPlayerController.showPlaylist()
-//            console.log(_playlist.currentIndex + "; " + audioPlayer.currentSongIndex)
-//            _player.playlist.moveItem(currentIndex, _player.playlist.currentIndex)
-//            _audioPlayerController.showPlaylist()
-//            _playlist.removeItem(_player.playlist.currentIndex + 1)
-//            console.log(_playlist.currentIndex + "; " + audioPlayer.currentSongIndex)
-//            _audioPlayerController.deleteSong(currentIndex)
-//            console.log(_playlist.currentIndex + "; " + audioPlayer.currentSongIndex)
-//            _audioPlayerController.showPlaylist()
+            isEditModeEnabled = !isEditModeEnabled
+            _player.pause()
+            isSongPlaying = false
 
-
-            console.log(_player.playlist.currentIndex + "; " + audioPlayer.currentSongIndex)
-            _player.playlist.removeItem(currentIndex)
-            console.log(_player.playlist.currentIndex + "; " + audioPlayer.currentSongIndex)
-            _audioPlayerController.deleteSong(currentIndex)
         }
     }
     MenuSeparator {

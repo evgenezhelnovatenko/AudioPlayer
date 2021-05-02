@@ -32,7 +32,7 @@ Rectangle {
                 source: Resources.songsList.volumeSoundIco
                 fillMode: Image.PreserveAspectFit
 
-                visible: _player.playlist.currentIndex === index ? true : false
+                visible: (_player.playlist.currentIndex === index && !isEditModeEnabled) ? true : false
             }
         }
 
@@ -42,10 +42,45 @@ Rectangle {
             font.pointSize: 13
             anchors.verticalCenter: parent.verticalCenter
         }
+        Rectangle {
+            width: 20
+            height: 20
+            anchors.verticalCenter: parent.verticalCenter
+            color: "transparent"
+            radius: width * 0.5
+            Image {
+                id: _deleteSongImg
+                anchors.fill: parent
+                source: Resources.songsList.deleteSongImg
+                fillMode: Image.PreserveAspectFit
+
+                visible: isEditModeEnabled
+                z: 1
+
+                MouseArea {
+                    id: _deleteSongArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+
+                    onClicked: {
+                        _songsListView.deleteSong(index)
+                    }
+                }
+            }
+
+            Rectangle {
+                id: _deleteSongHoverBackground
+                anchors.fill: parent
+                opacity: 0.4
+                color: _deleteSongArea.containsMouse ? Material.color(Material.Brown) : "transparent"
+                radius: width * 0.5
+                z: 5
+            }
+        }
     }
 
     MouseArea {
-        visible: true // _songsList.activeFocus
+        visible: !_deleteSongArea.containsMouse
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
@@ -55,11 +90,18 @@ Rectangle {
                 _popup.popup(_scrollView.parent, newPopupCoords.x, newPopupCoords.y)
             }
 
+            if (isEditModeEnabled)
+                return
+
             _songsList.currentIndex = index
             _songsList.forceActiveFocus()
         }
 
         onDoubleClicked: {
+
+            if (isEditModeEnabled)
+                return
+
             _audioPlayerController.setIndexOfIndices(index)
             _audioPlayerController.changeCurrentSongIndex()
 

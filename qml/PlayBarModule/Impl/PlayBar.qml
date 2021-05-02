@@ -73,6 +73,7 @@ Rectangle {
                         }
 
                         MouseArea {
+                            visible: !isEditModeEnabled
                             id: prevArea
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
@@ -98,6 +99,7 @@ Rectangle {
                         }
 
                         MouseArea {
+                            visible: !isEditModeEnabled
                             id: _playOrPauseArea
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
@@ -130,6 +132,7 @@ Rectangle {
                         }
 
                         MouseArea {
+                            visible: !isEditModeEnabled
                             id: _nextArea
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor

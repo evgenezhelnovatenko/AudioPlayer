@@ -108,7 +108,6 @@ void AudioPlayer::setnewSongsList(QList<QUrl> newSongsList)
 
     m_newSongsList = newSongsList;
     emit newSongsListChanged(m_newSongsList);
-    m_newSongsList.clear();
 }
 
 void AudioPlayer::setIndexOfIndices(int indexOfIndices)
@@ -153,8 +152,7 @@ void AudioPlayer::addNewSongs()
     }
     endInsertRows();
 
-    shuffleSongsIndices();
-
+    m_newSongsList.clear();
     mySongsFile->close();
 
 }

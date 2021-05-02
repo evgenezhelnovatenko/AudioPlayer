@@ -14,6 +14,7 @@ Rectangle {
     property var audioPlayer: _audioPlayerController.getModel()
     property bool isLoop: false
     property bool isShuffle: false
+    property bool isEditModeEnabled: false
 
     id: root
 
@@ -27,24 +28,6 @@ Rectangle {
         onModelHasBeenChanged: {
             audioPlayer = _audioPlayerController.getModel()
         }
-        onPlaylistHasBeenChanged: {
-
-            var playlist = _audioPlayerController.getPlaylist()
-            var itemCount = _player.playlist.itemCount
-            showPlaylist()
-            _player.playlist.insertItems(0, playlist)
-            showPlaylist()
-            _player.playlist.removeItems(itemCount, _player.playlist.itemCount - 1)
-            showPlaylist()
-
-            console.log(_player.playlist.currentIndex + "; " + audioPlayer.currentSongIndex)
-
-//            if (isShuffle) {
-//                _player.playlist.currentIndex = 0
-//            } else {
-//                _player.playlist.currentIndex = audioPlayer.currentSongIndex
-//            }
-        }
 
         function showPlaylist() {
             for (var i = 0; i < _player.playlist.itemCount; i++) {
@@ -52,6 +35,7 @@ Rectangle {
             }
             console.log("----------------------------------------------")
         }
+
     }
 
     Audio {
@@ -76,6 +60,7 @@ Rectangle {
         Component.onCompleted: {
             _player.playlist.addItems(_audioPlayerController.getPlaylist())
         }
+
 
     }
 
@@ -103,7 +88,6 @@ Rectangle {
 
     Playlist {
         id: _playlist
-        currentIndex: audioPlayer.currentSongIndex
 
         onCurrentIndexChanged: {
             console.log("currentIndex: " + currentIndex)
@@ -111,8 +95,17 @@ Rectangle {
                 _player.play()
         }
         onItemRemoved: {
-
+//            _songsListView.deleteSong()
+            console.log("onItemRemoved: " + _player.playlist.currentIndex + "; " + audioPlayer.currentSongIndex);
         }
+
+    }
+
+    Binding {
+        target: _playlist
+        property: "currentIndex"
+        value: audioPlayer.currentSongIndex
+
     }
 
     FileDialog {
@@ -123,7 +116,11 @@ Rectangle {
         nameFilters: "Music files (*.mp3 *.mp4 *.wpa)"
 
         onAccepted: {
-            audioPlayer.newSongsList =  _fileDialog.fileUrls
+            var newSongs = _fileDialog.fileUrls
+            audioPlayer.newSongsList = newSongs
+            _playlist.addItems(newSongs)
+            if (isShuffle)
+                _audioPlayerController.shuffleSongs()
         }
         onRejected: {
             console.log("Canceled")

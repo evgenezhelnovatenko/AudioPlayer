@@ -18,5 +18,6 @@ Item {
     QtObject {
         id: _songsList
         readonly property string volumeSoundIco: "qrc:/qml/resources/img/svg/volume_control_sound_icon_.svg"
+        readonly property string deleteSongImg: "qrc:/qml/resources/img/deleteSongImg.png"
     }
 }

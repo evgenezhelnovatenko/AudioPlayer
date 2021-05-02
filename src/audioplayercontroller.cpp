@@ -39,13 +39,11 @@ void AudioPlayerController::deleteSong(int songIndex)
 void AudioPlayerController::shuffleSongs()
 {
     player.shuffleSongsIndices();
-//    emit playlistHasBeenChanged();
 }
 
 void AudioPlayerController::sortSongs()
 {
     player.sortSongsIndices();
-//    emit playlistHasBeenChanged();
 }
 
 void AudioPlayerController::setIndexOfIndices(int songIndex)
