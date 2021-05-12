@@ -11,7 +11,7 @@ Rectangle {
     color: "transparent"
 
     function getFileName () {
-        var arr = source.split('/');
+        var arr = source.toString().split('/');
         return arr[arr.length - 1];
     }
 

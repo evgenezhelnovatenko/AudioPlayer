@@ -77,7 +77,7 @@ QVariant AudioPlayer::data(const QModelIndex &index, int role) const
         return {};
     }
 
-    return QVariant::fromValue(m_playlist[index_row]);
+    return QVariant::fromValue(m_playlist.at(index_row));
 }
 
 void AudioPlayer::changeIndexToNext()
@@ -147,7 +147,7 @@ void AudioPlayer::addNewSongs()
 
         QString newSong = m_newSongsList.at(i).toLocalFile();
         out << newSong << "\n";
-        m_playlist.push_back(newSong);
+        m_playlist.append(newSong);
         indices.push_back(indices.size());
     }
     endInsertRows();
@@ -159,8 +159,8 @@ void AudioPlayer::addNewSongs()
 
 void AudioPlayer::deleteSong(int songIndex)
 {
-    std::vector<QString>::const_iterator iteratorOfTheItemToRemoveFromPlaylist; // Ітератор елемента, що необхідно видалити з вектора m_playlist.
-    iteratorOfTheItemToRemoveFromPlaylist = m_playlist.cbegin() + songIndex;
+    QList<QUrl>::iterator iteratorOfTheItemToRemoveFromPlaylist; // Ітератор елемента, що необхідно видалити з вектора m_playlist.
+    iteratorOfTheItemToRemoveFromPlaylist = m_playlist.begin() + songIndex;
     std::vector<size_t>::const_iterator iteratorOfTheItemToRemoveFromIndices; // Ітератор елемента, що необхідно видалити з вектора indidces.
     int indexOfTheItemToRemoveFromIndices = calculateIndexOfIndices(m_playlist.size() - 1); // Індекс елемента, що необхідно видалити з вектора indidces.
     iteratorOfTheItemToRemoveFromIndices = indices.cbegin() + indexOfTheItemToRemoveFromIndices;
@@ -174,8 +174,6 @@ void AudioPlayer::deleteSong(int songIndex)
     dubbingToSongsFile();
 
     if (songIndex < m_currentSongIndex) {
-//        indexOfIndices--;
-//        m_currentSongIndex = indices[indexOfIndices];
         m_currentSongIndex--;
         indexOfIndices = calculateIndexOfIndices(m_currentSongIndex);
         emit currentSongIndexChanged(m_currentSongIndex);
@@ -207,20 +205,12 @@ void AudioPlayer::sortSongsIndices()
 
 QList<QUrl> AudioPlayer::playlist()
 {
-    QList<QUrl> playlist;
-
-    for (size_t i = 0; i < indices.size(); i++) {
-        size_t index = indices.at(i);
-        QUrl songUrl = QUrl::fromLocalFile(m_playlist.at(index));
-        playlist.append(songUrl);
-    }
-
-    return playlist;
+    return m_playlist;
 }
 
 void AudioPlayer::downloadJsonData()
 {
-    const QByteArray urlSpec = "https://musicbrainz.org/ws/2/recording/b9ad642e-b012-41c7-b72a-42cf4911f9ff?inc=artist-credits+isrcs+releases";
+    const QByteArray urlSpec = "http://musicbrainz.org/ws/2/recording/dd04637d-35e1-4241-a435-99d31d44b606?inc=media+discids";
     const QUrl newUrl = QUrl::fromEncoded(urlSpec);
 
 
@@ -338,7 +328,7 @@ void AudioPlayer::slotAuthenticationRequired(QNetworkReply *, QAuthenticator *au
     qDebug() << authenticator->realm() << " at " << url.host();
 
     authenticator->setUser("NeVr0t1k");
-    authenticator->setPassword("Zhe1n0v76");
+    authenticator->setPassword("dinamo03");
 }
 
 bool AudioPlayer::isPositionValid(const size_t position) const
@@ -355,9 +345,10 @@ bool AudioPlayer::readingSongsFromMySongsFile() // Зчитування спис
 
     QTextStream in(mySongsFile);
     while (!in.atEnd()) {
-        QString path = in.readLine();
-        m_playlist.push_back(path);
+        QUrl path = QUrl::fromLocalFile(in.readLine());
+        m_playlist.append(path);
     }
+//    m_playlist.append(QUrl::fromUserInput("http://ads.universalmusic.nl/top-notch/Fakkelteitgroep_Volume_2-2010.zip"));
 
     mySongsFile->close();
 
@@ -385,8 +376,8 @@ void AudioPlayer::dubbingToSongsFile()
     }
 
     QTextStream out(mySongsFile);
-    for (size_t i = 0; i < m_playlist.size(); i++) {
-        QString line = m_playlist.at(i) + "\n";
+    for (int i = 0; i < m_playlist.size(); i++) {
+        QString line = m_playlist.at(i).toString(QUrl::None) + "\n";
         out << line;
     }
 

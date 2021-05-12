@@ -83,7 +83,7 @@ private:
 
     QString pathToMySongsFile = "";
 
-    std::vector<QString> m_playlist;
+    QList<QUrl> m_playlist;
     std::vector<size_t> indices;
     int indexOfIndices;
     int m_currentSongIndex;

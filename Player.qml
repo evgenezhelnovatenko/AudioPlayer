@@ -59,6 +59,7 @@ Rectangle {
 
         Component.onCompleted: {
             _player.playlist.addItems(_audioPlayerController.getPlaylist())
+            _audioPlayerController.showPlaylist()
         }
 
 
