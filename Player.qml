@@ -11,7 +11,7 @@ import SongsListModule.Impl 1.0
 Rectangle {
 
     property bool isSongPlaying: false
-    property var audioPlayer: _audioPlayerController.getModel()
+    property var audioPlayer: _audioPlayerController.model()
     property bool isLoop: false
     property bool isShuffle: false
     property bool isEditModeEnabled: false
@@ -20,13 +20,14 @@ Rectangle {
 
     AudioPlayerController {
         id: _audioPlayerController;
+        objectName: "controller"
 
         onStopPlayingMusic: {
             isSongPlaying = false
             _player.stop()
         }
         onModelHasBeenChanged: {
-            audioPlayer = _audioPlayerController.getModel()
+            audioPlayer = _audioPlayerController.model()
         }
 
         function showPlaylist() {

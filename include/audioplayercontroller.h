@@ -4,7 +4,9 @@
 #include <QObject>
 #include <QList>
 #include <QUrl>
-#include <audioplayer.h>
+#include "audioplayer.h"
+
+class AudioPlayer;
 
 class AudioPlayerController : public QObject
 {
@@ -12,17 +14,20 @@ class AudioPlayerController : public QObject
 
 public:
     explicit AudioPlayerController(QObject *parent = nullptr);
+    ~AudioPlayerController();
 
     Q_INVOKABLE void changeIndexToNext();
     Q_INVOKABLE void changeIndexToPrevious();
     Q_INVOKABLE void changeCurrentSongIndex();
-    Q_INVOKABLE AudioPlayer *getModel();
-    Q_INVOKABLE void downloadJsonData();
+    Q_INVOKABLE AudioPlayer *model();
     Q_INVOKABLE void deleteSong(int songIndex);
     Q_INVOKABLE void shuffleSongs();
     Q_INVOKABLE void sortSongs();
     Q_INVOKABLE void setIndexOfIndices(int songIndex);
     Q_INVOKABLE QList<QUrl> getPlaylist();
+
+    /* Методи запитів до сервера */
+    Q_INVOKABLE void sendMessageToServer(QString msg);
 
 public slots:
     void stopThePlayer();
@@ -32,9 +37,8 @@ signals:
     void playlistHasBeenChanged();
     void modelHasBeenChanged();
 private:
-    AudioPlayer player;
+    AudioPlayer *m_model;
     QString m_filepath;
-
 
 };
 

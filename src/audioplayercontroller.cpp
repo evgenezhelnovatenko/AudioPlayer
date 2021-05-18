@@ -1,60 +1,67 @@
 #include "audioplayercontroller.h"
 
-AudioPlayerController::AudioPlayerController(QObject *parent) : QObject(parent)
+AudioPlayerController::AudioPlayerController(QObject *parent)
+    : QObject(parent)
+    , m_model (new AudioPlayer(this))
 {
-    connect(&player, &AudioPlayer::stopThePlayer, this, &AudioPlayerController::stopThePlayer);
-    connect(&player, &AudioPlayer::rowsAboutToBeInserted, this, &AudioPlayerController::modelHasBeenChanged);
+    connect(m_model, &AudioPlayer::stopThePlayer, this, &AudioPlayerController::stopThePlayer);
+    connect(m_model, &AudioPlayer::rowsAboutToBeInserted, this, &AudioPlayerController::modelHasBeenChanged);
+}
+
+AudioPlayerController::~AudioPlayerController()
+{
+    delete m_model;
 }
 
 void AudioPlayerController::changeIndexToNext()
 {
-    player.changeIndexToNext();
+    m_model->changeIndexToNext();
 }
 
 void AudioPlayerController::changeIndexToPrevious()
 {
-    player.changeIndexToPrevious();
+    m_model->changeIndexToPrevious();
 }
 
 void AudioPlayerController::changeCurrentSongIndex()
 {
-    player.changeCurrentSongIndex();
+    m_model->changeCurrentSongIndex();
 }
 
-AudioPlayer *AudioPlayerController::getModel()
+AudioPlayer *AudioPlayerController::model()
 {
-    return &player;
-}
-
-void AudioPlayerController::downloadJsonData()
-{
-    player.downloadJsonData();
+    return m_model;
 }
 
 void AudioPlayerController::deleteSong(int songIndex)
 {
-    player.deleteSong(songIndex);
+    m_model->deleteSong(songIndex);
 }
 
 void AudioPlayerController::shuffleSongs()
 {
-    player.shuffleSongsIndices();
+    m_model->shuffleSongsIndices();
 }
 
 void AudioPlayerController::sortSongs()
 {
-    player.sortSongsIndices();
+    m_model->sortSongsIndices();
 }
 
 void AudioPlayerController::setIndexOfIndices(int songIndex)
 {
-    int indexOfIndices = player.calculateIndexOfIndices(songIndex);
-    player.setIndexOfIndices(indexOfIndices);
+    int indexOfIndices = m_model->calculateIndexOfIndices(songIndex);
+    m_model->setIndexOfIndices(indexOfIndices);
 }
 
 QList<QUrl> AudioPlayerController::getPlaylist()
 {
-    return player.playlist();
+    return m_model->playlist();
+}
+
+void AudioPlayerController::sendMessageToServer(QString msg)
+{
+    m_model->client()->sendMessage(msg);
 }
 
 void AudioPlayerController::stopThePlayer()

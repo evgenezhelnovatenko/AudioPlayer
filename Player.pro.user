@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.14.0, 2021-05-11T13:02:31. -->
+<!-- Written by QtCreator 4.14.0, 2021-05-18T16:26:00. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -296,11 +296,13 @@
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:D:/Qt_Projects/Player/Player.pro</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">D:/Qt_Projects/Player/Player.pro</value>
+    <value type="QString" key="RunConfiguration.Arguments">&quot;127.0.0.1&quot;</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
+    <value type="bool" key="RunConfiguration.UseTerminal">false</value>
     <value type="QString" key="RunConfiguration.WorkingDirectory.default">D:/Qt_Projects/build-Player-Desktop_Qt_5_15_0_MinGW_32_bit-Debug</value>
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.RunConfigurationCount">1</value>

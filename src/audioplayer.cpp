@@ -19,8 +19,8 @@ AudioPlayer::AudioPlayer(QObject *parent)
     : QAbstractListModel {parent}
     , indexOfIndices (-1)
     , mySongsFile (new QFile(this))
-    , reply (nullptr)
     , file (nullptr)
+    , m_client (new Client(this))
 {
     filename = QDir::toNativeSeparators(QCoreApplication::applicationDirPath()) + "/file.txt";
 
@@ -38,16 +38,11 @@ AudioPlayer::AudioPlayer(QObject *parent)
 
     connect(this, &AudioPlayer::newSongsListChanged, this, &AudioPlayer::addNewSongs);
 
-    connect(&qnam, &QNetworkAccessManager::authenticationRequired,
-                this, &AudioPlayer::slotAuthenticationRequired);
-    #ifndef QT_NO_SSL
-        connect(&qnam, &QNetworkAccessManager::sslErrors,
-                this, &AudioPlayer::sslErrors);
-    #endif
 }
 
 AudioPlayer::~AudioPlayer()
 {
+    delete m_client;
     delete mySongsFile;
 }
 
@@ -208,49 +203,6 @@ QList<QUrl> AudioPlayer::playlist()
     return m_playlist;
 }
 
-void AudioPlayer::downloadJsonData()
-{
-    const QByteArray urlSpec = "http://musicbrainz.org/ws/2/recording/dd04637d-35e1-4241-a435-99d31d44b606?inc=media+discids";
-    const QUrl newUrl = QUrl::fromEncoded(urlSpec);
-
-
-    qDebug() << "url: " << newUrl;
-    if (!newUrl.isValid()) {
-        qDebug() << "url не правильний.";
-        return;
-    }
-
-    file = openFileForWrite(filename);
-
-    if (!file)
-        return;
-
-    startRequest(newUrl);
-}
-
-void AudioPlayer::startRequest(const QUrl &requestedUrl)
-{
-    url = requestedUrl;
-
-    QNetworkRequest request = createRequest();
-
-    reply = qnam.get(request);
-
-    connect(reply, &QNetworkReply::finished, this, &AudioPlayer::httpFinished);
-    connect(reply, &QNetworkReply::readyRead, this, &AudioPlayer::httpReadyRead);
-
-}
-
-QNetworkRequest AudioPlayer::createRequest()
-{
-    QNetworkRequest request;
-
-    request.setUrl(url);
-    request.setRawHeader("Accept","application/json");
-    request.setRawHeader("User-Agent", "AudioPlayer/1.1.0 (mr.zhelnovatenko@gmail.com)");
-
-    return request;
-}
 
 std::unique_ptr<QFile> AudioPlayer::openFileForWrite(const QString &fileName)
 {
@@ -260,75 +212,6 @@ std::unique_ptr<QFile> AudioPlayer::openFileForWrite(const QString &fileName)
         return nullptr;
     }
     return file;
-}
-
-QJsonObject AudioPlayer::parseReply(QNetworkReply *reply)
-{
-    QJsonObject jsonObj;
-    QJsonDocument jsonDoc;
-    QJsonParseError parseError;
-    auto replyText = reply->readAll();
-    jsonDoc = QJsonDocument::fromJson(replyText, &parseError);
-    if(parseError.error != QJsonParseError::NoError){
-        qDebug() << replyText;
-        qWarning() << "Json parse error: " << parseError.errorString();
-    }else{
-        if(jsonDoc.isObject())
-            jsonObj  = jsonDoc.object();
-        else if (jsonDoc.isArray())
-            jsonObj["non_field_errors"] = jsonDoc.array();
-    }
-    return jsonObj;
-}
-
-void AudioPlayer::httpReadyRead()
-{
-    if (file) {
-        file->write(reply->readAll());
-    }
-}
-
-void AudioPlayer::httpFinished()
-{
-    QFileInfo fi;
-    if (file) {
-        fi.setFile(file->fileName());
-        file->close();
-        file.reset();
-    }
-
-    if (reply->error() != QNetworkReply::NoError) {
-        QFile::remove(fi.absoluteFilePath());
-        QMetaEnum metaEnum = QMetaEnum::fromType<QNetworkReply::NetworkError>();
-        qDebug() << "reply->error(): " << metaEnum.valueToKey(reply->error());
-        reply->deleteLater();
-        reply = nullptr;
-
-        return;
-    }
-
-    const QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-
-    reply->deleteLater();
-    reply = nullptr;
-
-    if (!redirectionTarget.isNull()) {
-        const QUrl redirectedUrl = url.resolved(redirectionTarget.toUrl());
-        file = openFileForWrite(fi.absoluteFilePath());
-        if (!file) {
-            return;
-        }
-        startRequest(redirectedUrl);
-        return;
-    }
-}
-
-void AudioPlayer::slotAuthenticationRequired(QNetworkReply *, QAuthenticator *authenticator)
-{
-    qDebug() << authenticator->realm() << " at " << url.host();
-
-    authenticator->setUser("NeVr0t1k");
-    authenticator->setPassword("dinamo03");
 }
 
 bool AudioPlayer::isPositionValid(const size_t position) const
@@ -348,11 +231,15 @@ bool AudioPlayer::readingSongsFromMySongsFile() // Зчитування спис
         QUrl path = QUrl::fromLocalFile(in.readLine());
         m_playlist.append(path);
     }
-//    m_playlist.append(QUrl::fromUserInput("http://ads.universalmusic.nl/top-notch/Fakkelteitgroep_Volume_2-2010.zip"));
 
     mySongsFile->close();
 
     return true;
+}
+
+Client *AudioPlayer::client()
+{
+    return m_client;
 }
 
 void AudioPlayer::changeCurrentSongIndex()
@@ -391,15 +278,4 @@ void AudioPlayer::fillingTheVectorOfIndices()
     }
 }
 
-#ifndef QT_NO_SSL
-void AudioPlayer::sslErrors(QNetworkReply *, const QList<QSslError> &errors)
-{
-    QString errorString;
-    for (const QSslError &error : errors) {
-        if (!errorString.isEmpty())
-            errorString += '\n';
-        errorString += error.errorString();
-    }
-    reply->ignoreSslErrors();
-}
-#endif
+

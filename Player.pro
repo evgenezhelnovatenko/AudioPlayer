@@ -12,11 +12,14 @@ CONFIG += c++11
 SOURCES += \
         src/audioplayer.cpp \
         src/audioplayercontroller.cpp \
+        src/client.cpp \
         main.cpp
 
 RESOURCES += qml.qrc
 
 LIBS += -L"D:\Qt\Tools\OpenSSL\Win_x86\lib" -lpsapi
+LIBS += -lws2_32
+
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH = $$PWD/qml
@@ -28,6 +31,7 @@ QML_DESIGNER_IMPORT_PATH =
 INCLUDEPATH += $$PWD/include
 INCLUDEPATH += $$PWD/../shared/include
 
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
@@ -35,4 +39,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     include/audioplayer.h \
-    include/audioplayercontroller.h
+    include/audioplayercontroller.h \
+    include/client.h

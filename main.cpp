@@ -21,9 +21,10 @@ int main(int argc, char *argv[])
     engine.addImportPath(":/qml");
     const QUrl url(QStringLiteral("qrc:/main.qml"));
 
-    AudioPlayer player;
+    AudioPlayerController *controller = nullptr;
     qmlRegisterType<AudioPlayer>("Player", 1, 0, "AudioPlayer");
     qmlRegisterType<AudioPlayerController>("Player", 1, 0, "AudioPlayerController");
+
     QQuickStyle::setStyle("Material");
 
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
@@ -33,6 +34,14 @@ int main(int argc, char *argv[])
     }, Qt::QueuedConnection);
     QObject::connect(&engine, &QQmlApplicationEngine::quit, &QGuiApplication::quit);
     engine.load(url);
+
+    controller = engine.rootObjects()[0]->findChild<AudioPlayerController *>("controller");
+    QObject::connect(controller->model()->client(), &Client::serverErrorDetected, &QGuiApplication::quit);
+
+//    if (controller.model()->client()->validateTheParameters(argc)){
+//        printf("usage: %s server-name\n", argv[0]);
+//        return 1;
+//    }
 
     return app.exec();
 }

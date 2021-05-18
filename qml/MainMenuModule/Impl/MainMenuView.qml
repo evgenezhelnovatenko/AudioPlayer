@@ -20,9 +20,17 @@ MenuBar {
         }
         Action {
             id: _getRequest
-            text: qsTr("Отримати дані")
+            text: qsTr("На сервер ->")
             onTriggered: {
-                _audioPlayerController.downloadJsonData()
+                var message = "HHHHello!"
+                _audioPlayerController.sendMessageToServer(message)
+            }
+        }
+        Action {
+            id: _createConnection
+            text: qsTr("З'єднатися з сервером")
+            onTriggered: {
+                _audioPlayerController.createConnectionWithServer()
             }
         }
         Action {
