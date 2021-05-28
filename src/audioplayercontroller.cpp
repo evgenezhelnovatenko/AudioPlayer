@@ -2,10 +2,12 @@
 
 AudioPlayerController::AudioPlayerController(QObject *parent)
     : QObject(parent)
-    , m_model (new AudioPlayer(this))
+    , m_model (new AudioPlayerModel(this))
 {
-    connect(m_model, &AudioPlayer::stopThePlayer, this, &AudioPlayerController::stopThePlayer);
-    connect(m_model, &AudioPlayer::rowsAboutToBeInserted, this, &AudioPlayerController::modelHasBeenChanged);
+    connect(m_model, &AudioPlayerModel::stopThePlayer, this, &AudioPlayerController::stopThePlayer);
+    connect(m_model, &AudioPlayerModel::rowsAboutToBeInserted, this, &AudioPlayerController::modelHasBeenChanged);
+    connect(this, &AudioPlayerController::getMusicFile, m_model, &AudioPlayerModel::getMusicFile);
+    connect(this, &AudioPlayerController::getAllMusicFiles, m_model, &AudioPlayerModel::getAllMusicFiles);
 }
 
 AudioPlayerController::~AudioPlayerController()
@@ -28,7 +30,7 @@ void AudioPlayerController::changeCurrentSongIndex()
     m_model->changeCurrentSongIndex();
 }
 
-AudioPlayer *AudioPlayerController::model()
+AudioPlayerModel *AudioPlayerController::model()
 {
     return m_model;
 }
@@ -59,9 +61,14 @@ QList<QUrl> AudioPlayerController::getPlaylist()
     return m_model->playlist();
 }
 
-void AudioPlayerController::sendMessageToServer(QString msg)
+void AudioPlayerController::getAllMusicFilesInfoFromServer()
 {
-    m_model->client()->sendMessage(msg);
+    emit getAllMusicFiles();
+}
+
+void AudioPlayerController::getMusicFileFromServer(QString msg)
+{
+    emit getMusicFile(msg);
 }
 
 void AudioPlayerController::stopThePlayer()

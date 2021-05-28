@@ -3,10 +3,12 @@ import QtMultimedia 5.15
 import QtQuick.Dialogs 1.3
 import QtQuick.Controls.Material 2.12
 import QtQuick.Controls 2.15
-import Player 1.0
+import QtQuick.Layouts 1.15
+import AudioPlayer 1.0
 import PlayBarModule.Impl 1.0
 import MainMenuModule.Impl 1.0
 import SongsListModule.Impl 1.0
+import SidebarModule.Impl 1.0
 
 Rectangle {
 
@@ -54,13 +56,13 @@ Rectangle {
                         _audioPlayerController.changeIndexToNext()
                     }
                 }
-                console.log("kykyky")
+
             }
         }
 
         Component.onCompleted: {
             _player.playlist.addItems(_audioPlayerController.getPlaylist())
-            _audioPlayerController.showPlaylist()
+//            _audioPlayerController.showPlaylist()
         }
 
 
@@ -80,11 +82,31 @@ Rectangle {
             height: 25
         }
 
-        SongsListView {
-            id: _songsListView
-            anchors.margins: 20
+        Rectangle {
+            id: _mainContent
             width: root.width
             height: root.height - (_playbar.height + _mainMenu.height)
+            color: "transparent"
+
+            RowLayout {
+                anchors.fill: parent
+                anchors.margins: 5
+                spacing: 5
+
+                Sidebar {
+                    id: _sidebar
+                    Layout.minimumWidth: 200
+                    Layout.fillHeight: true
+
+                }
+
+                SongsListView {
+                    id: _songsListView
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 500
+                }
+            }
         }
     }
 

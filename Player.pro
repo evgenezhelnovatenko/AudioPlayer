@@ -1,6 +1,6 @@
 QT += quick \
       multimedia \
-      quickcontrols2
+      quickcontrols2 \
       network
 
 CONFIG += c++11
@@ -10,10 +10,19 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        src/audioplayer.cpp \
+        main.cpp \
+        src/audioplayermodel.cpp \
+        src/person.cpp \
         src/audioplayercontroller.cpp \
+        src/autor.cpp \
         src/client.cpp \
-        main.cpp
+        src/coautor.cpp \
+        src/ftp.cpp \
+        src/ftpclient.cpp \
+        src/genre.cpp \
+        src/serializer.cpp \
+        src/song.cpp \
+
 
 RESOURCES += qml.qrc
 
@@ -38,6 +47,14 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    include/audioplayer.h \
     include/audioplayercontroller.h \
-    include/client.h
+    include/audioplayermodel.h \
+    include/autor.h \
+    include/client.h \
+    include/coautor.h \
+    include/ftp.h \
+    include/ftpclient.h \
+    include/genre.h \
+    include/person.h \
+    include/serializer.h \
+    include/song.h \

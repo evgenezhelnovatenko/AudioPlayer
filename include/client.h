@@ -48,7 +48,7 @@ private:
 
     // private methods
     bool isWinsockError();
-    void printErrorMessage(QString errorMsg, int errorNumber = NULL);
+    void printErrorMessage(QString errorMsg, int errorNumber = 0);
 
 };
 

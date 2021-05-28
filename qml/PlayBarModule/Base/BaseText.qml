@@ -1,8 +1,9 @@
 import QtQuick 2.0
 import QtQuick.Controls.Material 2.12
 
-Text {
 
+Text {
+    id: _text
     font.family: "Helvetica"
     font.pointSize: 9
     color: Material.color(Material.Brown)
@@ -10,3 +11,4 @@ Text {
     verticalAlignment: Text.AlignVCenter
     elide: Text.ElideRight
 }
+

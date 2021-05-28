@@ -22,8 +22,15 @@ MenuBar {
             id: _getRequest
             text: qsTr("На сервер ->")
             onTriggered: {
-                var message = "HHHHello!"
-                _audioPlayerController.sendMessageToServer(message)
+                var message = "mr-nyoma-gr-dombaj-priora-remix-mp3.mp3"
+                _audioPlayerController.getMusicFile(message)
+            }
+        }
+        Action {
+            id: _getAllMusicsInfoRequest
+            text: qsTr("Усі пісні")
+            onTriggered: {
+                _audioPlayerController.getAllMusicFilesInfoFromServer();
             }
         }
         Action {

@@ -1,7 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>main.qml</file>
-        <file>Player.qml</file>
         <file>qml/MainMenuModule/Impl/MainMenuView.qml</file>
         <file>qml/MainMenuModule/Impl/MainMenuDelegate.qml</file>
         <file>qml/MainMenuModule/Impl/MainMenuItemDelegate.qml</file>
@@ -30,5 +28,12 @@
         <file>qml/ResourceProvider/qmldir</file>
         <file>qml/ResourceProvider/Resources.qml</file>
         <file>qml/resources/img/deleteSongImg.png</file>
+        <file>qml/SidebarModule/Impl/qmldir</file>
+        <file>qml/SidebarModule/qmldir</file>
+        <file>qml/SidebarModule/Impl/Sidebar.qml</file>
+        <file>qml/SidebarModule/Base/qmldir</file>
+        <file>qml/SidebarModule/Base/BaseText.qml</file>
+        <file>qml/main.qml</file>
+        <file>qml/Player.qml</file>
     </qresource>
 </RCC>

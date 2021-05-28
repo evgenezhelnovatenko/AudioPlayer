@@ -85,7 +85,6 @@ Rectangle {
         opacity: 0.25
         radius: 5
         anchors.fill: root
-        anchors.margins: 10
     }
 
     function deleteSong(index) {

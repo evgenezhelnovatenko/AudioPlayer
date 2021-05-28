@@ -83,6 +83,10 @@ bool Client::isWinsockError()
 
 void Client::printErrorMessage(QString errorMsg, int errorNumber)
 {
+    if (errorNumber == 0) {
+        qDebug() << errorMsg;
+        return;
+    }
     qDebug() << errorMsg << errorNumber;
 }
 

@@ -3,25 +3,23 @@
 #include <QMediaPlayer>
 #include <QDir>
 #include <QCoreApplication>
-#include <QNetworkReply>
 #include <QAuthenticator>
 #include <QMetaEnum>
-#include <QJsonDocument>
-#include <QJsonValue>
-#include <QJsonArray>
-#include <QJsonObject>
 #include <algorithm>
 #include <random>
 
-#include "audioplayer.h"
+#include "audioplayermodel.h"
 
-AudioPlayer::AudioPlayer(QObject *parent)
+AudioPlayerModel::AudioPlayerModel(QObject *parent)
     : QAbstractListModel {parent}
     , indexOfIndices (-1)
     , mySongsFile (new QFile(this))
     , file (nullptr)
-    , m_client (new Client(this))
+    , m_client (new FtpClient)
 {
+//    qDebug() << "current thread id: " << QThread::currentThreadId();
+    m_client->moveToThread(&serverThread);
+
     filename = QDir::toNativeSeparators(QCoreApplication::applicationDirPath()) + "/file.txt";
 
     pathToMySongsFile = QDir::toNativeSeparators(QCoreApplication::applicationDirPath()) + "/mySongs.txt";
@@ -36,31 +34,39 @@ AudioPlayer::AudioPlayer(QObject *parent)
     fillingTheVectorOfIndices();
     m_currentSongIndex = -1;
 
-    connect(this, &AudioPlayer::newSongsListChanged, this, &AudioPlayer::addNewSongs);
+    connect(this, &AudioPlayerModel::newSongsListChanged, this, &AudioPlayerModel::addNewSongs);
+    connect(&serverThread, &QThread::finished, m_client, &QObject::deleteLater);
+    connect(this, &AudioPlayerModel::getMusicFile, m_client, &FtpClient::getMusicFile);
+    connect(this, &AudioPlayerModel::getAllMusicFiles, m_client, &FtpClient::getAllMusicFilesInfo);
 
+    serverThread.start();
 }
 
-AudioPlayer::~AudioPlayer()
+AudioPlayerModel::~AudioPlayerModel()
 {
     delete m_client;
+
+    serverThread.quit();
+    serverThread.wait();
+
     delete mySongsFile;
 }
 
-QHash<int, QByteArray> AudioPlayer::roleNames() const
+QHash<int, QByteArray> AudioPlayerModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
-    roles[AudioPlayerRoles::SourceRole] = "source";
+    roles[AudioPlayerModelRoles::SourceRole] = "source";
 
     return roles;
 }
 
-int AudioPlayer::rowCount(const QModelIndex &parent) const
+int AudioPlayerModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return m_playlist.size();
 }
 
-QVariant AudioPlayer::data(const QModelIndex &index, int role) const
+QVariant AudioPlayerModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.row() > rowCount(index)) {
         return {};
@@ -75,19 +81,19 @@ QVariant AudioPlayer::data(const QModelIndex &index, int role) const
     return QVariant::fromValue(m_playlist.at(index_row));
 }
 
-void AudioPlayer::changeIndexToNext()
+void AudioPlayerModel::changeIndexToNext()
 {
     indexOfIndices++;
     changeCurrentSongIndex();
 }
 
-void AudioPlayer::changeIndexToPrevious()
+void AudioPlayerModel::changeIndexToPrevious()
 {
     indexOfIndices--;
     changeCurrentSongIndex();
 }
 
-void AudioPlayer::setCurrentSongIndex(int index)
+void AudioPlayerModel::setCurrentSongIndex(int index)
 {
     if (index == m_currentSongIndex)
         return;
@@ -96,7 +102,7 @@ void AudioPlayer::setCurrentSongIndex(int index)
     emit currentSongIndexChanged(m_currentSongIndex);
 }
 
-void AudioPlayer::setnewSongsList(QList<QUrl> newSongsList)
+void AudioPlayerModel::setnewSongsList(QList<QUrl> newSongsList)
 {
     if (m_newSongsList == newSongsList)
         return;
@@ -105,7 +111,7 @@ void AudioPlayer::setnewSongsList(QList<QUrl> newSongsList)
     emit newSongsListChanged(m_newSongsList);
 }
 
-void AudioPlayer::setIndexOfIndices(int indexOfIndices)
+void AudioPlayerModel::setIndexOfIndices(int indexOfIndices)
 {
     if (!isPositionValid(indexOfIndices)) {
         return;
@@ -114,7 +120,7 @@ void AudioPlayer::setIndexOfIndices(int indexOfIndices)
     this->indexOfIndices = indexOfIndices;
 }
 
-int AudioPlayer::calculateIndexOfIndices(int songIndex)
+int AudioPlayerModel::calculateIndexOfIndices(int songIndex)
 {
     if (!isPositionValid(songIndex)) {
         return -1;
@@ -129,7 +135,7 @@ int AudioPlayer::calculateIndexOfIndices(int songIndex)
     return -1;
 }
 
-void AudioPlayer::addNewSongs()
+void AudioPlayerModel::addNewSongs()
 {
     if (!mySongsFile->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
         qDebug() << "Помилка при додаванні нових файлів. Файл з музикою пошкоджено або видалено!";
@@ -152,7 +158,7 @@ void AudioPlayer::addNewSongs()
 
 }
 
-void AudioPlayer::deleteSong(int songIndex)
+void AudioPlayerModel::deleteSong(int songIndex)
 {
     QList<QUrl>::iterator iteratorOfTheItemToRemoveFromPlaylist; // Ітератор елемента, що необхідно видалити з вектора m_playlist.
     iteratorOfTheItemToRemoveFromPlaylist = m_playlist.begin() + songIndex;
@@ -180,7 +186,7 @@ void AudioPlayer::deleteSong(int songIndex)
     }
 }
 
-void AudioPlayer::shuffleSongsIndices()
+void AudioPlayerModel::shuffleSongsIndices()
 {
     static auto seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::mt19937 generator(seed);
@@ -191,35 +197,24 @@ void AudioPlayer::shuffleSongsIndices()
     indexOfIndices = 0;
 }
 
-void AudioPlayer::sortSongsIndices()
+void AudioPlayerModel::sortSongsIndices()
 {
     indexOfIndices = m_currentSongIndex;
 
     std::sort(indices.begin(), indices.end());
 }
 
-QList<QUrl> AudioPlayer::playlist()
+QList<QUrl> AudioPlayerModel::playlist()
 {
     return m_playlist;
 }
 
-
-std::unique_ptr<QFile> AudioPlayer::openFileForWrite(const QString &fileName)
-{
-    std::unique_ptr<QFile> file(new QFile(fileName));
-    if (!file->open(QIODevice::WriteOnly)) {
-        qDebug() << "Файл для результатів не відкривається";
-        return nullptr;
-    }
-    return file;
-}
-
-bool AudioPlayer::isPositionValid(const size_t position) const
+bool AudioPlayerModel::isPositionValid(const size_t position) const
 {
     return (position < indices.size() && position >= 0);
 }
 
-bool AudioPlayer::readingSongsFromMySongsFile() // Зчитування списку пісень з файлу та запис їх у m_playlist.
+bool AudioPlayerModel::readingSongsFromMySongsFile() // Зчитування списку пісень з файлу та запис їх у m_playlist.
 {
 
     if (!mySongsFile->open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -237,12 +232,12 @@ bool AudioPlayer::readingSongsFromMySongsFile() // Зчитування спис
     return true;
 }
 
-Client *AudioPlayer::client()
+FtpClient *AudioPlayerModel::client()
 {
     return m_client;
 }
 
-void AudioPlayer::changeCurrentSongIndex()
+void AudioPlayerModel::changeCurrentSongIndex()
 {
     if (!isPositionValid(indexOfIndices)) {
         emit stopThePlayer();
@@ -255,7 +250,7 @@ void AudioPlayer::changeCurrentSongIndex()
     emit currentSongIndexChanged(m_currentSongIndex);
 }
 
-void AudioPlayer::dubbingToSongsFile()
+void AudioPlayerModel::dubbingToSongsFile()
 {
     if (!mySongsFile->open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
         qDebug() << "Помилка при перезаписі файлу. Файл з музикою пошкоджено або видалено!";
@@ -271,7 +266,7 @@ void AudioPlayer::dubbingToSongsFile()
     mySongsFile->close();
 }
 
-void AudioPlayer::fillingTheVectorOfIndices()
+void AudioPlayerModel::fillingTheVectorOfIndices()
 {
     for (size_t i = 0; i < indices.size(); i++) {
         indices[i] = i;

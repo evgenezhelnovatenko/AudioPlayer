@@ -1,7 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
-#include "audioplayer.h"
+#include "audioplayermodel.h"
 #include "audioplayercontroller.h"
 
 int main(int argc, char *argv[])
@@ -19,11 +19,11 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     engine.addImportPath(":/qml");
-    const QUrl url(QStringLiteral("qrc:/main.qml"));
+    const QUrl url(QStringLiteral("qrc:/qml/main.qml"));
 
     AudioPlayerController *controller = nullptr;
-    qmlRegisterType<AudioPlayer>("Player", 1, 0, "AudioPlayer");
-    qmlRegisterType<AudioPlayerController>("Player", 1, 0, "AudioPlayerController");
+    qmlRegisterType<AudioPlayerModel>("AudioPlayer", 1, 0, "AudioPlayerModel");
+    qmlRegisterType<AudioPlayerController>("AudioPlayer", 1, 0, "AudioPlayerController");
 
     QQuickStyle::setStyle("Material");
 
@@ -36,12 +36,14 @@ int main(int argc, char *argv[])
     engine.load(url);
 
     controller = engine.rootObjects()[0]->findChild<AudioPlayerController *>("controller");
-    QObject::connect(controller->model()->client(), &Client::serverErrorDetected, &QGuiApplication::quit);
+//    QObject::connect(controller->model()->client(), &Client::serverErrorDetected, &QGuiApplication::quit);
 
 //    if (controller.model()->client()->validateTheParameters(argc)){
 //        printf("usage: %s server-name\n", argv[0]);
 //        return 1;
 //    }
+
+
 
     return app.exec();
 }
