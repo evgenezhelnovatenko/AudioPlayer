@@ -3,6 +3,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.12
 
 MenuItem {
+
     id: _menuItem
     contentItem: Text {
         leftPadding: 15

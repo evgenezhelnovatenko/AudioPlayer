@@ -6,6 +6,9 @@
 class Genre : public QObject
 {
     Q_OBJECT
+
+    Q_PROPERTY(QString m_name READ name WRITE setName NOTIFY m_nameChanged)
+
 public:
     explicit Genre(QObject *parent = nullptr);
     explicit Genre(const Genre& other);
@@ -28,10 +31,15 @@ public:
         return *this;
     }
 
+signals:
+    void m_nameChanged(QString m_name);
+
 private:
     int m_id = -1;
     QString m_name = "";
 
 };
+
+Q_DECLARE_METATYPE(Genre);
 
 #endif // GENRE_H

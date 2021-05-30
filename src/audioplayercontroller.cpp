@@ -58,7 +58,51 @@ void AudioPlayerController::setIndexOfIndices(int songIndex)
 
 QList<QUrl> AudioPlayerController::getPlaylist()
 {
-    return m_model->playlist();
+    QList<QUrl> playlist;
+
+    for (auto& song : m_model->playlist()) {
+        playlist.append(QUrl::fromLocalFile(song.url()));
+    }
+
+    return playlist;
+}
+
+void AudioPlayerController::getMyMusic()
+{
+    m_model->setPlaylistAsActiveSongList();
+}
+
+Song *AudioPlayerController::getSong(int index)
+{
+    Song* song = m_model->getRow(index);
+    return song;
+}
+
+Autor *AudioPlayerController::getAutorOfSong(int index)
+{
+    Song* song = getSong(index);
+    Autor* autor = song->autor();
+    return autor;
+}
+
+QList<Genre*> AudioPlayerController::getGenresOfSong(int index)
+{
+    Song* song = getSong(index);
+    QList<Genre*> genres;
+    for (auto& genre : *(song->genres())) {
+        genres.push_back(&genre);
+    }
+    return genres;
+}
+
+QList<CoAutor *> AudioPlayerController::getCoAutorsOfSong(int index)
+{
+    Song* song = getSong(index);
+    QList<CoAutor*> co_autors;
+    for (auto& co_autor : *(song->co_autors())) {
+        co_autors.push_back(&co_autor);
+    }
+    return co_autors;
 }
 
 void AudioPlayerController::getAllMusicFilesInfoFromServer()

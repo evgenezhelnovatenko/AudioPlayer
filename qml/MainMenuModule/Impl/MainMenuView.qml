@@ -27,20 +27,6 @@ MenuBar {
             }
         }
         Action {
-            id: _getAllMusicsInfoRequest
-            text: qsTr("Усі пісні")
-            onTriggered: {
-                _audioPlayerController.getAllMusicFilesInfoFromServer();
-            }
-        }
-        Action {
-            id: _createConnection
-            text: qsTr("З'єднатися з сервером")
-            onTriggered: {
-                _audioPlayerController.createConnectionWithServer()
-            }
-        }
-        Action {
             id: _changeTheme
             text: qsTr("Змінити тему")
             onTriggered: {

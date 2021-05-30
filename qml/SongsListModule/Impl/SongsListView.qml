@@ -1,9 +1,16 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.12
+import QtQuick.Layouts 1.15
+
 import PopupMenuModule.Impl 1.0
+import SongsListModule.Base 1.0
+import Song 1.0
 
 Rectangle {
+
+    property var popupMenu: _popup.menu1
+
     id: root
     color: "transparent"
     clip: true
@@ -41,7 +48,9 @@ Rectangle {
         ListView {
             id: _songsList
             anchors.fill: parent
-            delegate: SongsListDelegate { }
+            delegate: SongsListDelegate {
+                id: _songListDelegate
+            }
             boundsBehavior: Flickable.StopAtBounds
 
             highlight: _highlight
@@ -67,6 +76,219 @@ Rectangle {
                 _songsList.model = audioPlayer
             }
 
+            Component {
+                id: _dialogComponent
+
+                Dialog {
+                    property var song
+                    property var autor
+                    property var genres
+                    property string genresStr: ""
+                    property var co_autors
+                    property string co_autorsStr: ""
+
+
+                    id: _infoAboutSongDialog
+                    width: 300
+
+                    title: qsTr("Інформація про композицію")
+                    standardButtons: Dialog.Ok
+                    x: (_songsList.width - _infoAboutSongDialog.width) / 2
+                    y: (_songsList.height - _infoAboutSongDialog.height) / 2
+
+                    contentItem: Rectangle {
+
+                        color: "transparent"
+                        ColumnLayout {
+                            id: _infoAboutSong
+                            width: parent.width
+
+                            spacing: 2
+                            clip: true
+
+                            RowLayout {
+
+                                Layout.fillWidth: true
+                                Layout.minimumHeight: 25
+                                Layout.maximumHeight: 200
+                                spacing: 2
+
+                                BaseInfoText {
+                                    text: qsTr("Назва: ")
+                                    Layout.alignment: Qt.AlignTop
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.maximumWidth: _infoAboutSong.width / 3
+                                }
+
+                                BaseInfoText {
+                                    text: song.m_title
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.maximumWidth: _infoAboutSong.width * 2/3
+                                }
+                            }
+                            BaseDemarcationLine {
+                                Layout.fillWidth: true
+                            }
+                            RowLayout {
+
+                                Layout.fillWidth: true
+                                Layout.maximumHeight: 200
+                                spacing: 2
+
+                                BaseInfoText {
+                                    text: qsTr("Рік: ")
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.maximumWidth: _infoAboutSong.width / 3
+                                }
+                                BaseInfoText {
+                                    text: song.m_year
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.maximumWidth: _infoAboutSong.width * 2/3
+                                }
+                            }
+                            BaseDemarcationLine {
+                                Layout.fillWidth: true
+                            }
+                            RowLayout {
+
+                                Layout.fillWidth: true
+                                Layout.maximumHeight: 200
+                                spacing: 2
+
+                                BaseInfoText {
+                                    text: qsTr("Довжина: ")
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.maximumWidth: _infoAboutSong.width / 3
+                                }
+                                BaseInfoText {
+                                    text: Math.floor(song.m_length / 60000) + ":" + song.m_length / 1000 % 60
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.maximumWidth: _infoAboutSong.width * 2/3
+                                }
+                            }
+                            BaseDemarcationLine {
+                                Layout.fillWidth: true
+                            }
+                            RowLayout {
+
+                                Layout.fillWidth: true
+                                Layout.maximumHeight: 200
+                                spacing: 2
+
+                                BaseInfoText {
+                                    text: qsTr("Автор: ")
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.maximumWidth: _infoAboutSong.width / 3
+                                }
+                                BaseInfoText {
+                                    text: autor.pseudonym === ""
+                                            ? _infoAboutSongDialog.getFullAutorName(autor.firstname, autor.lastname)
+                                            : autor.pseudonym
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.maximumWidth: _infoAboutSong.width * 2/3
+                                }
+                            }
+                            BaseDemarcationLine {
+                                Layout.fillWidth: true
+                            }
+                            RowLayout {
+
+                                Layout.fillWidth: true
+                                Layout.maximumHeight: 200
+                                spacing: 2
+
+                                BaseInfoText {
+                                    text: qsTr("Жанр: ")
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.maximumWidth: _infoAboutSong.width / 3
+                                }
+                                BaseInfoText {
+                                    text: genresStr
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.maximumWidth: _infoAboutSong.width * 2/3
+                                }
+                            }
+                            BaseDemarcationLine {
+                                Layout.fillWidth: true
+                            }
+                            RowLayout {
+
+                                Layout.fillWidth: true
+                                Layout.maximumHeight: 200
+                                spacing: 2
+
+                                BaseInfoText {
+                                    text: qsTr("Співвиконавці: ")
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.maximumWidth: _infoAboutSong.width / 3
+                                }
+                                BaseInfoText {
+                                    text: co_autorsStr
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.maximumWidth: _infoAboutSong.width * 2/3
+                                }
+                            }
+                            BaseDemarcationLine {
+                                Layout.fillWidth: true
+                            }
+                        }
+                    }
+
+                    onGenresChanged: {
+                        genresStr = getGenresString()
+                    }
+                    onCo_autorsChanged: {
+                        co_autorsStr = getCoAutorsString()
+                    }
+
+                    function getGenresString() {
+                        var genresString = ""
+                        genres.forEach((genre, index, arr) => {
+                                           genresString += genre.m_name
+                                           if (index < arr.length - 1)
+                                                genresString += ", "
+                                       })
+                        return genresString
+                    }
+                    function getCoAutorsString() {
+                        var co_autorsString = ""
+                        co_autors.forEach((co_autor, index, arr) => {
+                                              if (co_autor.pseudonym === "")
+                                                  co_autorsString += getFullAutorName(co_autor.firstname, co_autor.lastname)
+                                              else {
+                                                  co_autorsString += co_autor.pseudonym
+                                              }
+                                              if (index < arr.length - 1)
+                                                  co_autorsString += ", "
+                                          })
+                        return co_autorsString
+                    }
+                    function getFullAutorName(firstname, lastname) {
+                        return firstname + " " + lastname
+                    }
+
+                }
+
+            }
+            Loader {
+                id: _loader
+
+            }
+
+
+
         }
 
     }
@@ -87,6 +309,10 @@ Rectangle {
         anchors.fill: root
     }
 
+
+
+
+
     function deleteSong(index) {
         var currentSongPosition = _player.position
 
@@ -96,4 +322,10 @@ Rectangle {
         _player.seek(currentSongPosition)
     }
 
+    function changePopupMenu() {
+        if (popupMenu === _popup.menu1)
+            popupMenu = _popup.menu2
+        else if (popupMenu === _popup.menu2)
+            popupMenu = _popup.menu1
+    }
 }

@@ -4,6 +4,7 @@ import QtQuick.Controls.Material 2.12
 Rectangle {
 
     property alias text: _text.text
+    property bool isSelected: false
 
     id: _root
     width: parent.width
@@ -24,19 +25,19 @@ Rectangle {
         MouseArea {
             anchors.fill: parent
             hoverEnabled: true
-            onEntered: {
-                _background.visible = true
-            }
-            onExited: {
-                _background.visible = false
-            }
+//            onEntered: {
+//                _background.visible = true
+//            }
+//            onExited: {
+//                _background.visible = false
+//            }
 
         }
     }
 
     Rectangle {
         id: _background
-        visible: false
+        visible: isSelected
         anchors.fill: parent
         color: Material.color(Material.Grey, Material.ShadeA200)
         opacity: 0.25

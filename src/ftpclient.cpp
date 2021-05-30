@@ -6,7 +6,6 @@
 #include <QBuffer>
 #include <QFile>
 #include <QList>
-#include "serializer.h"
 
 FtpClient::FtpClient()
 {
@@ -124,12 +123,16 @@ void FtpClient::getAllMusicFilesInfo()
         out << buffer.buffer();
 
         buffer.close();
+        f.close();
 
-        std::list<Song> songlist;
+        QList<Song> songlist;
 
-        bool r = Serializer::JSONDesirealizer(songlist, jsonStr);
+        if (!Serializer::JSONDesirealizer(songlist, jsonStr))
+            return;
 
-        for (auto& song : songlist) {
+        emit sendListOfMusicFromServerToModel(songlist);
+
+        /*for (auto& song : songlist) {
             qDebug() << "id: " << song.id();
             qDebug() << "title: " << song.title();
             qDebug() << "url: " << song.url();
@@ -155,9 +158,7 @@ void FtpClient::getAllMusicFilesInfo()
                 qDebug() << "pseudonym: " << co_autor.pseudonym();
             }
             qDebug() << "---------------------------------------";
-        }
-
-        f.close();
+        }*/
     }
 
 }

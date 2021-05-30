@@ -6,6 +6,12 @@
 class Person : public QObject
 {
     Q_OBJECT
+
+//    Q_PROPERTY(QString m_firstname READ firstname WRITE setFirstname NOTIFY m_firstnameChanged)
+//    Q_PROPERTY(QString m_lastname READ lastname WRITE setLastname NOTIFY m_lastnameChanged)
+//    Q_PROPERTY(QString m_pseudonym READ pseudonym WRITE setPseudonym NOTIFY m_pseudonymChanged)
+
+
 public:
     explicit Person(QObject *parent = nullptr);
     explicit Person(const Person& other, QObject *parent = nullptr);
@@ -13,11 +19,11 @@ public:
 
     void setId(int id);						  // set id.
     int id() const;								  // get id.
-    void setFirstname(QString firstname); // set firsname.
+    virtual void setFirstname(QString firstname); // set firsname.
     QString firstname() const;				  // get firstname.
-    void setLastname(QString lastname);   // set lastname.
+    virtual void setLastname(QString lastname);   // set lastname.
     QString lastname() const;					  // get lastname.
-    void setPseudonym(QString pseudonym); // set pseudonym.
+    virtual void setPseudonym(QString pseudonym); // set pseudonym.
     QString pseudonym() const;				  // get pseudonym.
 
     friend bool operator== (const Person& a1, const Person& a2);
@@ -35,6 +41,13 @@ public:
     }
 
 
+//signals:
+//    void m_firstnameChanged(QString m_firstname);
+
+//    void m_lastnameChanged(QString m_lastname);
+
+//    void m_pseudonymChanged(QString m_pseudonym);
+
 protected:
     int m_id = -1;
     QString m_firstname = "";
@@ -42,5 +55,7 @@ protected:
     QString m_pseudonym = "";
 
 };
+
+Q_DECLARE_METATYPE(Person);
 
 #endif // PERSON_H

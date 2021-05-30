@@ -5,9 +5,8 @@ Song::Song(QObject *parent) : QObject(parent)
 
 }
 
-Song::Song(const Song &other, QObject* parent)
-    : QObject(parent)
-    , m_id(other.m_id)
+Song::Song(const Song &other)
+    : m_id(other.m_id)
     , m_title(other.m_title)
     , m_url(other.m_url)
     , m_year(other.m_year)
@@ -19,13 +18,20 @@ Song::Song(const Song &other, QObject* parent)
 
 }
 
-Song::Song(int id, QString title, QString url, int year, int length, const Autor& autor)
+Song::Song(int id, QString title, QString url, int year, int length, const Autor& autor, const std::list<Genre>& genres, const std::list<CoAutor>& co_autors)
     : m_id(id)
     , m_title(title)
     , m_url(url)
     , m_year(year)
     , m_length(length)
     , m_autor(autor)
+    , m_genres(genres)
+    , m_co_autors(co_autors)
+{
+
+}
+
+Song::Song(QString title, QString url) : m_title(title), m_url(url)
 {
 
 }
@@ -49,6 +55,8 @@ void Song::setTitle(QString title)
         return;
 
     m_title = title;
+
+    emit m_titleChanged(m_title);
 }
 
 QString Song::title() const
@@ -62,6 +70,8 @@ void Song::setUrl(QString url)
         return;
 
     m_url = url;
+
+    emit m_urlChanged(m_url);
 }
 
 QString Song::url() const
@@ -75,6 +85,8 @@ void Song::setYear(int year)
         return;
 
     m_year = year;
+
+    emit m_yearChanged(m_year);
 }
 
 int Song::year() const
@@ -88,6 +100,8 @@ void Song::setLength(int length)
         return;
 
     m_length = length;
+
+    emit m_lengthChanged(m_length);
 }
 
 int Song::length() const
@@ -103,9 +117,9 @@ void Song::setAutor(Autor autor)
     m_autor = autor;
 }
 
-Autor Song::autor()
+Autor* Song::autor()
 {
-    return m_autor;
+    return &m_autor;
 }
 
 void Song::setGenres(const std::list<Genre>& genres)

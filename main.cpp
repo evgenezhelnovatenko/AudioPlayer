@@ -22,6 +22,13 @@ int main(int argc, char *argv[])
     const QUrl url(QStringLiteral("qrc:/qml/main.qml"));
 
     AudioPlayerController *controller = nullptr;
+    qRegisterMetaType<QList<Song>>();
+    qRegisterMetaType<QList<Genre*>>();
+    qRegisterMetaType<QList<CoAutor*>>();
+    qmlRegisterType<Song>("Song", 1, 0, "Song");
+    qmlRegisterType<Autor>("Autor", 1, 0, "Autor");
+    qmlRegisterType<CoAutor>("CoAutor", 1, 0, "CoAutor");
+    qmlRegisterType<Genre>("Genre", 1, 0, "Genre");
     qmlRegisterType<AudioPlayerModel>("AudioPlayer", 1, 0, "AudioPlayerModel");
     qmlRegisterType<AudioPlayerController>("AudioPlayer", 1, 0, "AudioPlayerController");
 

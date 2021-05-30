@@ -8,7 +8,6 @@
 #include <QUrl>
 #include <QNetworkAccessManager>
 #include <QThread>
-#include <list>
 
 #include "ftpclient.h"
 #include "serializer.h"
@@ -26,8 +25,13 @@ public:
     AudioPlayerModel(QObject *parent = nullptr);
     ~AudioPlayerModel();
 
-    enum AudioPlayerModelRoles {
-        SourceRole = Qt::UserRole + 1
+    enum AudioPlayerRoles {
+        SourceRole = Qt::UserRole + 1,
+        TitleRole,
+        UrlRole,
+        YearRole,
+        LengthRole,
+
     };
 
     // QAbstractItemModel interface
@@ -46,23 +50,26 @@ public:
         return m_newSongsList;
     }
 
-    void changeIndexToNext(); // Р—РјС–РЅР° РїРѕС‚РѕС‡РЅРѕРіРѕ С–РЅРґРµРєСЃСѓ РїС–СЃРЅС– РЅР° РЅР°СЃС‚СѓРїРЅРёР№.
-    void changeIndexToPrevious(); // Р—РјС–РЅР° РїРѕС‚РѕС‡РЅРѕРіРѕ С–РЅРґРµРєСЃСѓ РїС–СЃРЅС– РЅР° РїРѕРїРµСЂРµРґРЅС–Р№.
-    void changeCurrentSongIndex(); // Р—РјС–РЅР° РїРѕС‚РѕС‡РЅРѕРіРѕ С–РЅРґРµРєСЃСѓ.
-    void addNewSongs(); // Р”РѕРґР°РІР°РЅСЏ СЃРїРёСЃРєСѓ РЅРѕРІРѕС— РјСѓР·РёРєРё Сѓ РїРѕС‚РѕС‡РЅРёР№ СЃРїРёСЃРѕРє РјСѓР·РёРєРё.
-    void deleteSong(int songIndex); // Р’РёРґР°Р»РµРЅРЅСЏ РїС–СЃРЅС– Р·Р° С–РЅРґРµРєСЃРѕРј.
+    void changeIndexToNext(); // Зміна поточного індексу пісні на наступний.
+    void changeIndexToPrevious(); // Зміна поточного індексу пісні на попередній.
+    void changeCurrentSongIndex(); // Зміна поточного індексу.
+    void addNewSongs(); // Додаваня списку нової музики у поточний список музики.
+    void deleteSong(int songIndex); // Видалення пісні за індексом.
     void shuffleSongsIndices();
     void sortSongsIndices();
-    QList<QUrl> playlist();
-    void setIndexOfIndices(int indexOfIndices); // Р’СЃС‚Р°РЅРѕРІР»РµРЅРЅСЏ С–РЅРґРµРєСЃСѓ РІРµРєС‚РѕСЂР° С–РЅРґРµРєСЃС–РІ.
+    std::vector<Song> playlist();
+    void setIndexOfIndices(int indexOfIndices); // Встановлення індексу вектора індексів.
     int calculateIndexOfIndices(int songIndex);
+    Song* getRow(int index);
 
     FtpClient *client();
 
 
 public slots:
-    void setnewSongsList(QList<QUrl> newSongsList); // Р—РјС–РЅР° СЃРїРёСЃРєСѓ РЅРѕРІРѕС— РјСѓР·РёРєРё.
-    void setCurrentSongIndex(int index); // Р—РјС–РЅР° РїРѕС‚РѕС‡РЅРѕРіРѕ С–РЅРґРµРєСЃСѓ РјСѓР·РёРєРё.
+    void setnewSongsList(QList<QUrl> newSongsList); // Зміна списку нової музики.
+    void setCurrentSongIndex(int index); // Зміна поточного індексу музики.
+    void setSonglistAsActiveSongList(const QList<Song>& songlist);
+    void setPlaylistAsActiveSongList();
 
 signals:
     void stopThePlayer();
@@ -73,15 +80,19 @@ signals:
     void getAllMusicFiles();
 
 private:
-    void dubbingToSongsFile(); // РџРµСЂРµР·Р°РїРёСЃ РїС–СЃРµРЅСЊ Сѓ С„Р°Р№Р» mySongs.txt.
-    void fillingTheVectorOfIndices(); // Р—Р°РїРѕРІРЅРµРЅРЅСЏ РІРµРєС‚РѕСЂСѓ С–РЅРґРµРєСЃС–РІ.
+    void dubbingToSongsFile(); // Перезапис пісень у файл mySongs.txt.
+    void fillingTheVectorOfIndices(); // Заповнення вектору індексів.
+
+    void receiveSongListFromServer(const QList<Song>& songlist);
 
     bool isPositionValid(const size_t position) const;
     bool readingSongsFromMySongsFile();
 
     QString pathToMySongsFile = "";
 
-    QList<QUrl> m_playlist;
+    std::vector<Song> m_playlist; // Список пісень на комп'ютері.
+    std::vector<Song> m_songlist; // Список пісень з серверу.
+    std::vector<Song>* m_pointerToActiveList = nullptr; // Вказівник на необхідний список пісень.
     std::vector<size_t> indices;
     int indexOfIndices;
     int m_currentSongIndex;

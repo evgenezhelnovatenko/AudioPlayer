@@ -4,6 +4,7 @@
 #include <QObject>
 #include <memory>
 #include "ftp.h"
+#include "serializer.h"
 
 #define CONNECT_ON_PORT 8888
 
@@ -23,7 +24,7 @@ public slots:
     void getAllMusicFilesInfo();
 
 signals:
-
+    void sendListOfMusicFromServerToModel(const QList<Song>& songlist);
 
 private:
     struct sockaddr_in ServerAddr;		/* Server address */

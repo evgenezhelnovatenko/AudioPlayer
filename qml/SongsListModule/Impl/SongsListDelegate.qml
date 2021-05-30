@@ -4,16 +4,14 @@ import QtQuick.Controls.Material 2.12
 import ResourceProvider 1.0
 
 Rectangle {
+
+    property int year: year
+
     id: root
     width: _songsList.width
     height: 40
 
     color: "transparent"
-
-    function getFileName () {
-        var arr = source.toString().split('/');
-        return arr[arr.length - 1];
-    }
 
     Row {
         leftPadding: 5
@@ -37,7 +35,7 @@ Rectangle {
         }
 
         Text {
-            text: '<b>' + root.getFileName() + '<\b>'
+            text: '<b>' + title + '<\b>'
             font.family: "Helvetica"
             font.pointSize: 13
             anchors.verticalCenter: parent.verticalCenter
@@ -80,14 +78,15 @@ Rectangle {
     }
 
     MouseArea {
-        visible: !_deleteSongArea.containsMouse
+        id: _mouseArea
+        visible: true  //!_deleteSongArea.containsMouse
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
         onPressed: {
             if (mouse.button == Qt.RightButton) {
                 var newPopupCoords = getNewPopupCoord(mouse.x, mouse.y)
-                _popup.popup(_scrollView.parent, newPopupCoords.x, newPopupCoords.y)
+                popupMenu.popup(_scrollView.parent, newPopupCoords.x, newPopupCoords.y)
             }
 
             if (isEditModeEnabled)
@@ -124,14 +123,14 @@ Rectangle {
             y: positionInSongsList.y
         }
 
-        if (positionInSongsList.x + _popup.width > _scrollView.parent.width) {
-            newCoords.x = _scrollView.parent.width - _popup.width
+        if (positionInSongsList.x + popupMenu.width > _scrollView.parent.width) {
+            newCoords.x = _scrollView.parent.width - popupMenu.width
         }
-        if (positionInSongsList.y + _popup.height > _scrollView.parent.height) {
-            newCoords.y = positionInSongsList.y - _popup.height
+        if (positionInSongsList.y + popupMenu.height > _scrollView.parent.height) {
+            newCoords.y = positionInSongsList.y - popupMenu.height
         }
 
-        return newCoords;
+        return newCoords
     }
 
 }

@@ -9,7 +9,7 @@ Serializer::Serializer(QObject *parent) : QObject(parent)
 
 }
 
-bool Serializer::JSONDesirealizer(std::list<Song>& songlist, const QString& jsonStr)
+bool Serializer::JSONDesirealizer(QList<Song>& songlist, const QString& jsonStr)
 {
 
     QJsonObject jsonObj = ObjectFromString(jsonStr);
@@ -25,8 +25,6 @@ bool Serializer::JSONDesirealizer(std::list<Song>& songlist, const QString& json
                 qDebug() << "failed filling song.";
                 return false;
             }
-
-            qDebug() << song.genres()->size();
 
             songlist.push_back(song);
         }

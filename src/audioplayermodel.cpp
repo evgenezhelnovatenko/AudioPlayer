@@ -12,6 +12,7 @@
 
 AudioPlayerModel::AudioPlayerModel(QObject *parent)
     : QAbstractListModel {parent}
+    , m_pointerToActiveList(&m_playlist)
     , indexOfIndices (-1)
     , mySongsFile (new QFile(this))
     , file (nullptr)
@@ -38,6 +39,7 @@ AudioPlayerModel::AudioPlayerModel(QObject *parent)
     connect(&serverThread, &QThread::finished, m_client, &QObject::deleteLater);
     connect(this, &AudioPlayerModel::getMusicFile, m_client, &FtpClient::getMusicFile);
     connect(this, &AudioPlayerModel::getAllMusicFiles, m_client, &FtpClient::getAllMusicFilesInfo);
+    connect(m_client, &FtpClient::sendListOfMusicFromServerToModel, this, &AudioPlayerModel::setSonglistAsActiveSongList);
 
     serverThread.start();
 }
@@ -55,7 +57,11 @@ AudioPlayerModel::~AudioPlayerModel()
 QHash<int, QByteArray> AudioPlayerModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
-    roles[AudioPlayerModelRoles::SourceRole] = "source";
+    roles[AudioPlayerRoles::SourceRole] = "source";
+    roles[AudioPlayerRoles::TitleRole] = "title";
+    roles[AudioPlayerRoles::UrlRole] = "url";
+    roles[AudioPlayerRoles::YearRole] = "year";
+    roles[AudioPlayerRoles::LengthRole] = "length";
 
     return roles;
 }
@@ -63,7 +69,7 @@ QHash<int, QByteArray> AudioPlayerModel::roleNames() const
 int AudioPlayerModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return m_playlist.size();
+    return m_pointerToActiveList->size();
 }
 
 QVariant AudioPlayerModel::data(const QModelIndex &index, int role) const
@@ -78,7 +84,25 @@ QVariant AudioPlayerModel::data(const QModelIndex &index, int role) const
         return {};
     }
 
-    return QVariant::fromValue(m_playlist.at(index_row));
+    const Song& song {m_pointerToActiveList->at(index_row)};
+
+    switch (role) {
+    case AudioPlayerRoles::TitleRole: {
+        return QVariant::fromValue(song.title());
+    }
+    case AudioPlayerRoles::UrlRole: {
+        return QVariant::fromValue(song.url());
+    }
+    case AudioPlayerRoles::YearRole: {
+        return QVariant::fromValue(song.year());
+    }
+    case AudioPlayerRoles::LengthRole: {
+        return QVariant::fromValue(song.length());
+    }
+    default: {
+        return true;
+    }
+    }
 }
 
 void AudioPlayerModel::changeIndexToNext()
@@ -100,6 +124,31 @@ void AudioPlayerModel::setCurrentSongIndex(int index)
 
     m_currentSongIndex = index;
     emit currentSongIndexChanged(m_currentSongIndex);
+}
+
+void AudioPlayerModel::setSonglistAsActiveSongList(const QList<Song>& songlist)
+{
+    receiveSongListFromServer(songlist);
+
+    beginResetModel();
+    m_pointerToActiveList = &m_songlist;
+    endResetModel();
+}
+
+void AudioPlayerModel::setPlaylistAsActiveSongList()
+{
+    beginResetModel();
+    m_pointerToActiveList = &m_playlist;
+    endResetModel();
+}
+
+void AudioPlayerModel::receiveSongListFromServer(const QList<Song>& songlist)
+{
+    m_songlist.clear();
+
+    for (const auto& song : songlist) {
+        m_songlist.push_back(song);
+    }
 }
 
 void AudioPlayerModel::setnewSongsList(QList<QUrl> newSongsList)
@@ -135,6 +184,11 @@ int AudioPlayerModel::calculateIndexOfIndices(int songIndex)
     return -1;
 }
 
+Song* AudioPlayerModel::getRow(int index)
+{
+    return &(m_songlist.at(index));
+}
+
 void AudioPlayerModel::addNewSongs()
 {
     if (!mySongsFile->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
@@ -145,10 +199,11 @@ void AudioPlayerModel::addNewSongs()
     QTextStream out(mySongsFile);
     beginInsertRows(QModelIndex(), m_playlist.size(), m_playlist.size() + m_newSongsList.size() - 1);
     for (int i = 0; i < m_newSongsList.size(); i++) {
-
-        QString newSong = m_newSongsList.at(i).toLocalFile();
-        out << newSong << "\n";
-        m_playlist.append(newSong);
+        QString newSongUrl = m_newSongsList.at(i).toLocalFile();
+        QString newSongTitle = newSongUrl.split('/').last();
+        Song song(newSongTitle, newSongUrl);
+        out << newSongUrl << "\n";
+        m_playlist.push_back(song);
         indices.push_back(indices.size());
     }
     endInsertRows();
@@ -160,7 +215,7 @@ void AudioPlayerModel::addNewSongs()
 
 void AudioPlayerModel::deleteSong(int songIndex)
 {
-    QList<QUrl>::iterator iteratorOfTheItemToRemoveFromPlaylist; // Ітератор елемента, що необхідно видалити з вектора m_playlist.
+    std::vector<Song>::iterator iteratorOfTheItemToRemoveFromPlaylist; // Ітератор елемента, що необхідно видалити з вектора m_playlist.
     iteratorOfTheItemToRemoveFromPlaylist = m_playlist.begin() + songIndex;
     std::vector<size_t>::const_iterator iteratorOfTheItemToRemoveFromIndices; // Ітератор елемента, що необхідно видалити з вектора indidces.
     int indexOfTheItemToRemoveFromIndices = calculateIndexOfIndices(m_playlist.size() - 1); // Індекс елемента, що необхідно видалити з вектора indidces.
@@ -204,7 +259,7 @@ void AudioPlayerModel::sortSongsIndices()
     std::sort(indices.begin(), indices.end());
 }
 
-QList<QUrl> AudioPlayerModel::playlist()
+std::vector<Song> AudioPlayerModel::playlist()
 {
     return m_playlist;
 }
@@ -223,8 +278,12 @@ bool AudioPlayerModel::readingSongsFromMySongsFile() // Зчитування с�
 
     QTextStream in(mySongsFile);
     while (!in.atEnd()) {
-        QUrl path = QUrl::fromLocalFile(in.readLine());
-        m_playlist.append(path);
+//        QUrl path = QUrl::fromLocalFile(in.readLine());
+//        m_playlist.append(path);
+        QString url = in.readLine();
+        QString title = url.split('/').last();
+        Song song(title, url);
+        m_playlist.push_back(song);
     }
 
     mySongsFile->close();
@@ -258,8 +317,8 @@ void AudioPlayerModel::dubbingToSongsFile()
     }
 
     QTextStream out(mySongsFile);
-    for (int i = 0; i < m_playlist.size(); i++) {
-        QString line = m_playlist.at(i).toString(QUrl::None) + "\n";
+    for (int i = 0; i < static_cast<int>(m_playlist.size()); i++) {
+        QString line = m_playlist.at(i).url() + "\n";
         out << line;
     }
 

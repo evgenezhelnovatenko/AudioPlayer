@@ -1,9 +1,10 @@
-import QtQuick 2.0
+import QtQuick 2.15
 import QtMultimedia 5.15
 import QtQuick.Dialogs 1.3
 import QtQuick.Controls.Material 2.12
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+
 import AudioPlayer 1.0
 import PlayBarModule.Impl 1.0
 import MainMenuModule.Impl 1.0
@@ -104,7 +105,7 @@ Rectangle {
                     id: _songsListView
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    Layout.minimumWidth: 500
+//                    Layout.minimumWidth: 500
                 }
             }
         }
@@ -183,4 +184,5 @@ Rectangle {
                 _mainWindow.Material.theme = Material.Dark
         }
     }
+
 }

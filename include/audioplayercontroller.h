@@ -25,6 +25,11 @@ public:
     Q_INVOKABLE void sortSongs();
     Q_INVOKABLE void setIndexOfIndices(int songIndex);
     Q_INVOKABLE QList<QUrl> getPlaylist();
+    Q_INVOKABLE void getMyMusic();
+    Q_INVOKABLE Song* getSong(int index);
+    Q_INVOKABLE Autor* getAutorOfSong(int index);
+    Q_INVOKABLE QList<Genre*> getGenresOfSong(int index);
+    Q_INVOKABLE QList<CoAutor*> getCoAutorsOfSong(int index);
 
     /* Методи запитів до сервера */
     Q_INVOKABLE void getMusicFileFromServer(QString msg);

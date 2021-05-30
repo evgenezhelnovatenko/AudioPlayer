@@ -1,0 +1,3 @@
+module Base
+BaseInfoText 1.0 BaseInfoText.qml
+BaseDemarcationLine 1.0 BaseDemarcationLine.qml

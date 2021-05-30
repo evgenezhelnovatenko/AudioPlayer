@@ -7,13 +7,20 @@
 #include "genre.h"
 #include "coautor.h"
 
+
 class Song : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString m_title READ title WRITE setTitle NOTIFY m_titleChanged)
+    Q_PROPERTY(QString m_url READ url WRITE setUrl NOTIFY m_urlChanged)
+    Q_PROPERTY(int m_year READ year WRITE setYear NOTIFY m_yearChanged)
+    Q_PROPERTY(int m_length READ length WRITE setLength NOTIFY m_lengthChanged)
+
 public:
     explicit Song(QObject *parent = nullptr);
-    explicit Song(const Song& other, QObject* parent = nullptr);
-    explicit Song(int id, QString title, QString url, int year, int length, const Autor& autor);
+    explicit Song(const Song& other);
+    explicit Song(int id, QString title, QString url, int year, int length, const Autor& autor, const std::list<Genre>& genres, const std::list<CoAutor>& co_autors);
+    explicit Song(QString title, QString url);
 
     void setId(int id);
     int id() const;
@@ -26,7 +33,7 @@ public:
     void setLength(int length);
     int length() const;
     void setAutor(Autor autor);
-    Autor autor();
+    Autor* autor();
     void setGenres(const std::list<Genre>& genres);
     std::list<Genre>* genres();
     void setCo_autors(const std::list<CoAutor>& co_autors);
@@ -48,6 +55,15 @@ public:
         return *this;
     }
 
+signals:
+    void m_titleChanged(QString m_title);
+
+    void m_yearChanged(int m_year);
+
+    void m_urlChanged(QString m_url);
+
+    void m_lengthChanged(int m_length);
+
 private:
     int m_id = -1;
     QString m_title = "";
@@ -57,7 +73,8 @@ private:
     Autor m_autor;
     std::list<Genre> m_genres;
     std::list<CoAutor> m_co_autors;
-
 };
+
+Q_DECLARE_METATYPE(Song);
 
 #endif // SONG_H

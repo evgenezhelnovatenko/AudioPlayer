@@ -18,10 +18,38 @@ Rectangle {
 
 
         BaseText {
+            id: _myMusic
             text: qsTr("Музика на пристрої")
+
+            MouseArea {
+                anchors.fill: parent
+
+                onClicked: {
+                    if (!_myMusic.isSelected)
+                        _audioPlayerController.getMyMusic();
+                    _myMusic.isSelected = true
+                    _musicForDownload.isSelected = false
+
+                    _songsListView.changePopupMenu()
+                }
+            }
         }
         BaseText {
+            id: _musicForDownload
             text: qsTr("Музика на сервері")
+
+            MouseArea {
+                anchors.fill: parent
+
+                onClicked: {
+                    if (!_musicForDownload.isSelected)
+                        _audioPlayerController.getAllMusicFilesInfoFromServer();
+                    _musicForDownload.isSelected = true
+                    _myMusic.isSelected = false
+
+                    _songsListView.changePopupMenu()
+                }
+            }
         }
     }
 

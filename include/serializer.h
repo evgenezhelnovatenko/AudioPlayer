@@ -14,7 +14,7 @@ class Serializer : public QObject
 public:
     explicit Serializer(QObject *parent = nullptr);
 
-    static bool JSONDesirealizer(std::list<Song>& songlist, const QString& jsonStr);
+    static bool JSONDesirealizer(QList<Song>& songlist, const QString& jsonStr);
 
     static bool fillSong(Song& song, const QJsonValue& songJsonVal);
     static bool fillAutor(Autor& autor, const QJsonValue& autorJsonVal);

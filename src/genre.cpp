@@ -38,6 +38,8 @@ void Genre::setName(QString name)
         return;
 
     m_name = name;
+
+    emit m_nameChanged(m_name);
 }
 
 QString Genre::name() const
