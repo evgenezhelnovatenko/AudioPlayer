@@ -19,6 +19,7 @@ class AudioPlayerModel : public QAbstractListModel
     Q_OBJECT
     Q_PROPERTY(int currentSongIndex READ currentSongIndex WRITE setCurrentSongIndex NOTIFY currentSongIndexChanged)
     Q_PROPERTY(QList<QUrl> newSongsList READ newSongsList WRITE setnewSongsList NOTIFY newSongsListChanged)
+    Q_PROPERTY(QString downloadFolder READ downloadFolder WRITE setDownloadFolder NOTIFY downloadFolderChanged)
 
 
 public:
@@ -62,14 +63,20 @@ public:
     int calculateIndexOfIndices(int songIndex);
     Song* getRow(int index);
 
+
     FtpClient *client();
 
+
+    QString downloadFolder() const;
 
 public slots:
     void setnewSongsList(QList<QUrl> newSongsList); // Зміна списку нової музики.
     void setCurrentSongIndex(int index); // Зміна поточного індексу музики.
     void setSonglistAsActiveSongList(const QList<Song>& songlist);
     void setPlaylistAsActiveSongList();
+    void onConnectionFailed();
+
+    void setDownloadFolder(QString downloadFolder);
 
 signals:
     void stopThePlayer();
@@ -78,10 +85,16 @@ signals:
     void newSongsWasAdded();
     void getMusicFile(QString);
     void getAllMusicFiles();
+    void connectToServer();
+    void connectionFailed();
+    void serverReadyToRequest();
+
+    void downloadFolderChanged(QString downloadFolder);
 
 private:
     void dubbingToSongsFile(); // Перезапис пісень у файл mySongs.txt.
     void fillingTheVectorOfIndices(); // Заповнення вектору індексів.
+    void m_clientInitialization();
 
     void receiveSongListFromServer(const QList<Song>& songlist);
 
@@ -103,6 +116,7 @@ private:
     FtpClient* m_client = nullptr;
     QThread serverThread;
 
+    QString m_downloadFolder;
 };
 
 #endif // AUDIOPLAYERMODEL_H

@@ -7,6 +7,8 @@ Item {
     property alias menu1: _menu1
     property alias menu2: _menu2
 
+    id: root
+
     Menu {
 
         id: _menu1
@@ -15,7 +17,7 @@ Item {
 
         Action {
             id: _addSongsAction
-            text: qsTr("Додати пісні")
+            text: qsTr("Додати треки")
             shortcut: "Ctrl+G"
             onTriggered: {
                 _fileDialog.visible = true
@@ -61,17 +63,33 @@ Item {
         Action {
             text: qsTr("Інформація")
             onTriggered: {
-                _loader.sourceComponent = _dialogComponent
-                _loader.item.song = _audioPlayerController.getSong(_songsList.currentIndex)
-                _loader.item.autor = _audioPlayerController.getAutorOfSong(_songsList.currentIndex)
-                _loader.item.genres = _audioPlayerController.getGenresOfSong(_songsList.currentIndex)
-                _loader.item.co_autors = _audioPlayerController.getCoAutorsOfSong(_songsList.currentIndex)
+                root.setSongInfo()
+                if (_loader.status === Loader.Null)
+                    _loader.sourceComponent = _dialogComponent
                 _loader.item.open()
+            }
+        }
+        Action {
+            text: qsTr("Завантажити трек")
+            onTriggered: {
+                var song = _audioPlayerController.getSong(_songsList.currentIndex)
+                var url = song.url + ".mp3"
+                console.log(url)
+                _audioPlayerController.getMusicFileFromServer(url)
             }
         }
 
         delegate: PopupMenuDelegate { }
 
+
+
+    }
+
+    function setSongInfo() {
+        _songsList.song = _audioPlayerController.getSong(_songsList.currentIndex)
+        _songsList.autor = _audioPlayerController.getAutorOfSong(_songsList.currentIndex)
+        _songsList.genres = _audioPlayerController.getGenresOfSong(_songsList.currentIndex)
+        _songsList.co_autors = _audioPlayerController.getCoAutorsOfSong(_songsList.currentIndex)
     }
 
 }

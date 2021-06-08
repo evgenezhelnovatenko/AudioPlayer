@@ -42,6 +42,8 @@ void Person::setFirstname(QString firstname)
         return;
 
     m_firstname = firstname;
+
+    emit firstnameChanged(m_firstname);
 }
 
 QString Person::firstname() const
@@ -55,6 +57,8 @@ void Person::setLastname(QString lastname)
         return;
 
     m_lastname = lastname;
+
+    emit lastnameChanged(m_lastname);
 }
 
 QString Person::lastname() const
@@ -68,6 +72,8 @@ void Person::setPseudonym(QString pseudonym)
         return;
 
     m_pseudonym = pseudonym;
+
+    emit pseudonymChanged(m_pseudonym);
 }
 
 QString Person::pseudonym() const

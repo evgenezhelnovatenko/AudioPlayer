@@ -7,11 +7,11 @@ class Genre : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString m_name READ name WRITE setName NOTIFY m_nameChanged)
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
 
 public:
     explicit Genre(QObject *parent = nullptr);
-    explicit Genre(const Genre& other);
+    explicit Genre(const Genre& other, QObject *parent = nullptr);
     explicit Genre(int id, QString name);
 
     void setId(int id);
@@ -32,7 +32,7 @@ public:
     }
 
 signals:
-    void m_nameChanged(QString m_name);
+    void nameChanged(QString m_name);
 
 private:
     int m_id = -1;

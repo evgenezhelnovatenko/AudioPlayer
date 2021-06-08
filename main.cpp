@@ -24,7 +24,8 @@ int main(int argc, char *argv[])
     AudioPlayerController *controller = nullptr;
     qRegisterMetaType<QList<Song>>();
     qRegisterMetaType<QList<Genre*>>();
-    qRegisterMetaType<QList<CoAutor*>>();
+    qRegisterMetaType<QList<CoAutor*
+            >>();
     qmlRegisterType<Song>("Song", 1, 0, "Song");
     qmlRegisterType<Autor>("Autor", 1, 0, "Autor");
     qmlRegisterType<CoAutor>("CoAutor", 1, 0, "CoAutor");

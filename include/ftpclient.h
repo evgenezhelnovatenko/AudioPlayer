@@ -18,21 +18,23 @@ public:
     bool doDownload(Frame);
     bool doShutdown();
     int toCommandCode(QString);
+    bool createConnection();
 
 public slots:
+    void connectToServer();
     void getMusicFile(QString filename);
     void getAllMusicFilesInfo();
 
 signals:
     void sendListOfMusicFromServerToModel(const QList<Song>& songlist);
+    void connectionFailed();
+    void serverReadyToRequest();
 
 private:
     struct sockaddr_in ServerAddr;		/* Server address */
     char remoteHostname[HOSTNAME_LENGTH] = "192.168.0.100";
     int sock;
     int debug;
-
-
 
 };
 

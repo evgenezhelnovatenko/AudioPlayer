@@ -46,6 +46,14 @@ Rectangle {
 
 
         ListView {
+
+            property var song
+            property var autor
+            property var genres: []
+            property string genresStr: ""
+            property var co_autors: []
+            property string co_autorsStr: ""
+
             id: _songsList
             anchors.fill: parent
             delegate: SongsListDelegate {
@@ -80,13 +88,6 @@ Rectangle {
                 id: _dialogComponent
 
                 Dialog {
-                    property var song
-                    property var autor
-                    property var genres
-                    property string genresStr: ""
-                    property var co_autors
-                    property string co_autorsStr: ""
-
 
                     id: _infoAboutSongDialog
                     width: 300
@@ -109,7 +110,6 @@ Rectangle {
                             RowLayout {
 
                                 Layout.fillWidth: true
-                                Layout.minimumHeight: 25
                                 Layout.maximumHeight: 200
                                 spacing: 2
 
@@ -122,7 +122,7 @@ Rectangle {
                                 }
 
                                 BaseInfoText {
-                                    text: song.m_title
+                                    text: _songsList.song.title
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     Layout.maximumWidth: _infoAboutSong.width * 2/3
@@ -144,7 +144,7 @@ Rectangle {
                                     Layout.maximumWidth: _infoAboutSong.width / 3
                                 }
                                 BaseInfoText {
-                                    text: song.m_year
+                                    text: _songsList.song.year
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     Layout.maximumWidth: _infoAboutSong.width * 2/3
@@ -166,7 +166,7 @@ Rectangle {
                                     Layout.maximumWidth: _infoAboutSong.width / 3
                                 }
                                 BaseInfoText {
-                                    text: Math.floor(song.m_length / 60000) + ":" + song.m_length / 1000 % 60
+                                    text: _songsList.getSongLengthStr(_songsList.song.length)
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     Layout.maximumWidth: _infoAboutSong.width * 2/3
@@ -188,9 +188,9 @@ Rectangle {
                                     Layout.maximumWidth: _infoAboutSong.width / 3
                                 }
                                 BaseInfoText {
-                                    text: autor.pseudonym === ""
-                                            ? _infoAboutSongDialog.getFullAutorName(autor.firstname, autor.lastname)
-                                            : autor.pseudonym
+                                    text: _songsList.autor.pseudonym === ""
+                                            ? _songsList.getFullAutorName(_songsList.autor.firstname, _songsList.autor.lastname)
+                                            : _songsList.autor.pseudonym
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     Layout.maximumWidth: _infoAboutSong.width * 2/3
@@ -212,7 +212,7 @@ Rectangle {
                                     Layout.maximumWidth: _infoAboutSong.width / 3
                                 }
                                 BaseInfoText {
-                                    text: genresStr
+                                    text: _songsList.genresStr
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     Layout.maximumWidth: _infoAboutSong.width * 2/3
@@ -234,7 +234,7 @@ Rectangle {
                                     Layout.maximumWidth: _infoAboutSong.width / 3
                                 }
                                 BaseInfoText {
-                                    text: co_autorsStr
+                                    text: _songsList.co_autorsStr
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     Layout.maximumWidth: _infoAboutSong.width * 2/3
@@ -246,38 +246,7 @@ Rectangle {
                         }
                     }
 
-                    onGenresChanged: {
-                        genresStr = getGenresString()
-                    }
-                    onCo_autorsChanged: {
-                        co_autorsStr = getCoAutorsString()
-                    }
 
-                    function getGenresString() {
-                        var genresString = ""
-                        genres.forEach((genre, index, arr) => {
-                                           genresString += genre.m_name
-                                           if (index < arr.length - 1)
-                                                genresString += ", "
-                                       })
-                        return genresString
-                    }
-                    function getCoAutorsString() {
-                        var co_autorsString = ""
-                        co_autors.forEach((co_autor, index, arr) => {
-                                              if (co_autor.pseudonym === "")
-                                                  co_autorsString += getFullAutorName(co_autor.firstname, co_autor.lastname)
-                                              else {
-                                                  co_autorsString += co_autor.pseudonym
-                                              }
-                                              if (index < arr.length - 1)
-                                                  co_autorsString += ", "
-                                          })
-                        return co_autorsString
-                    }
-                    function getFullAutorName(firstname, lastname) {
-                        return firstname + " " + lastname
-                    }
 
                 }
 
@@ -288,6 +257,41 @@ Rectangle {
             }
 
 
+            onGenresChanged: {
+                genresStr = getGenresString()
+            }
+            onCo_autorsChanged: {
+                co_autorsStr = getCoAutorsString()
+            }
+
+            function getGenresString() {
+                var genresString = ""
+                genres.forEach((genre, index, arr) => {
+                                   genresString += genre.name
+                                   if (index < arr.length - 1)
+                                        genresString += ", "
+                               })
+                return genresString
+            }
+            function getCoAutorsString() {
+                var co_autorsString = ""
+                co_autors.forEach((co_autor, index, arr) => {
+                                      if (co_autor.pseudonym === "")
+                                          co_autorsString += getFullAutorName(co_autor.firstname, co_autor.lastname)
+                                      else {
+                                          co_autorsString += co_autor.pseudonym
+                                      }
+                                      if (index < arr.length - 1)
+                                          co_autorsString += ", "
+                                  })
+                return co_autorsString
+            }
+            function getFullAutorName(firstname, lastname) {
+                return firstname + " " + lastname
+            }
+            function getSongLengthStr(length) {
+                return Math.floor(length / 60000).toString() + ":" + (length / 1000 % 60).toString()
+            }
 
         }
 

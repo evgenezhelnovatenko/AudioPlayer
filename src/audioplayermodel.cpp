@@ -15,11 +15,8 @@ AudioPlayerModel::AudioPlayerModel(QObject *parent)
     , m_pointerToActiveList(&m_playlist)
     , indexOfIndices (-1)
     , mySongsFile (new QFile(this))
-    , file (nullptr)
-    , m_client (new FtpClient)
 {
-//    qDebug() << "current thread id: " << QThread::currentThreadId();
-    m_client->moveToThread(&serverThread);
+    m_clientInitialization();
 
     filename = QDir::toNativeSeparators(QCoreApplication::applicationDirPath()) + "/file.txt";
 
@@ -37,9 +34,6 @@ AudioPlayerModel::AudioPlayerModel(QObject *parent)
 
     connect(this, &AudioPlayerModel::newSongsListChanged, this, &AudioPlayerModel::addNewSongs);
     connect(&serverThread, &QThread::finished, m_client, &QObject::deleteLater);
-    connect(this, &AudioPlayerModel::getMusicFile, m_client, &FtpClient::getMusicFile);
-    connect(this, &AudioPlayerModel::getAllMusicFiles, m_client, &FtpClient::getAllMusicFilesInfo);
-    connect(m_client, &FtpClient::sendListOfMusicFromServerToModel, this, &AudioPlayerModel::setSonglistAsActiveSongList);
 
     serverThread.start();
 }
@@ -142,6 +136,24 @@ void AudioPlayerModel::setPlaylistAsActiveSongList()
     endResetModel();
 }
 
+void AudioPlayerModel::onConnectionFailed()
+{
+    delete m_client;
+
+    m_clientInitialization();
+
+    emit connectionFailed();
+}
+
+void AudioPlayerModel::setDownloadFolder(QString downloadFolder)
+{
+    if (m_downloadFolder == downloadFolder)
+        return;
+
+    m_downloadFolder = downloadFolder;
+    emit downloadFolderChanged(m_downloadFolder);
+}
+
 void AudioPlayerModel::receiveSongListFromServer(const QList<Song>& songlist)
 {
     m_songlist.clear();
@@ -186,7 +198,8 @@ int AudioPlayerModel::calculateIndexOfIndices(int songIndex)
 
 Song* AudioPlayerModel::getRow(int index)
 {
-    return &(m_songlist.at(index));
+    Song *song = new Song(m_songlist.at(index), this);
+    return song;
 }
 
 void AudioPlayerModel::addNewSongs()
@@ -296,6 +309,11 @@ FtpClient *AudioPlayerModel::client()
     return m_client;
 }
 
+QString AudioPlayerModel::downloadFolder() const
+{
+    return m_downloadFolder;
+}
+
 void AudioPlayerModel::changeCurrentSongIndex()
 {
     if (!isPositionValid(indexOfIndices)) {
@@ -330,6 +348,23 @@ void AudioPlayerModel::fillingTheVectorOfIndices()
     for (size_t i = 0; i < indices.size(); i++) {
         indices[i] = i;
     }
+}
+
+void AudioPlayerModel::m_clientInitialization()
+{
+    m_client = new FtpClient;
+
+    m_client->moveToThread(&serverThread);
+
+    setDownloadFolder(m_client->getDEFAULT_FOLDER());
+
+    connect(this, &AudioPlayerModel::getMusicFile, m_client, &FtpClient::getMusicFile);
+    connect(this, &AudioPlayerModel::getAllMusicFiles, m_client, &FtpClient::getAllMusicFilesInfo);
+    connect(this, &AudioPlayerModel::connectToServer, m_client, &FtpClient::connectToServer);
+    connect(m_client, &FtpClient::sendListOfMusicFromServerToModel, this, &AudioPlayerModel::setSonglistAsActiveSongList);
+    connect(m_client, &FtpClient::connectionFailed, this, &AudioPlayerModel::onConnectionFailed);
+    connect(m_client, &FtpClient::serverReadyToRequest, this, &AudioPlayerModel::serverReadyToRequest);
+    connect(this, &AudioPlayerModel::downloadFolderChanged, m_client, &FtpClient::setDEFAULT_FOLDER);
 }
 
 

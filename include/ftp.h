@@ -25,29 +25,45 @@ typedef struct {
     char filename[FILENAME_LENGTH];
 } Frame;
 
+enum ConStatus{
+    ESTABLISHED = 1,
+    NOT_ESTABLISHED = 0
+} ;
+
 class Ftp : public QObject
 {
     Q_OBJECT
 
-    private:
-        int sock;						/* Socket descriptor */
-        struct sockaddr_in ServAddr;	/* server socket address */
-        unsigned short ServPort;		/* server port */
-        WSADATA wsaData;
-        char myHostname[HOSTNAME_LENGTH];
 
-        bool bOptVal = 1;
-        int bOptLen = sizeof (bool);
+private:
+    int sock;						/* Socket descriptor */
+
+    struct sockaddr_in ServAddr;	/* server socket address */
+    unsigned short ServPort;		/* server port */
+    WSADATA wsaData;
+    char myHostname[HOSTNAME_LENGTH];
+    QString DEFAULT_FOLDER = "D:\\Qt_Projects\\build-Player-Desktop_Qt_5_15_0_MinGW_32_bit-Debug";
+
+    bool bOptVal = 1;
+    int bOptLen = sizeof (bool);
 
 
-    public:
-        void Init();
-        int createSocket();
-        unsigned long ResolveName(char name[]);
-        bool file_exists(char * filename);
-        bool recvFileAndWrite(char * filename, int sock);
-        void err_sys(char *fmt,...);
+public:
+    bool Init();
+    int createSocket();
+    unsigned long ResolveName(char name[]);
+    bool file_exists(char * filename);
+    bool recvFileAndWrite(char * filename, int sock);
+    void err_sys(char *fmt,...);
+    int connectionStatus();
 
+    QString getDEFAULT_FOLDER() const;
+
+public slots:
+    void setDEFAULT_FOLDER(const QString &value);
+
+protected:
+    int status = ConStatus::NOT_ESTABLISHED;
 };
 
 #endif // FTP_H

@@ -18,6 +18,7 @@ Rectangle {
     property bool isLoop: false
     property bool isShuffle: false
     property bool isEditModeEnabled: false
+    property bool isServerMusicListSelected: false
 
     id: root
 
@@ -39,7 +40,15 @@ Rectangle {
             }
             console.log("----------------------------------------------")
         }
-
+        onConnectionFailed: {
+            _connFailedMsgDialog.open()
+            _sidebar.changeCurrentSelectedItem()
+            _sidebar.unblockingUnnecessaryFunctions()
+        }
+        onServerReadyToRequest: {
+            _songsListView.changePopupMenu()
+            _audioPlayerController.getAllMusicFilesInfoFromServer();
+        }
     }
 
     Audio {
@@ -135,7 +144,7 @@ Rectangle {
 
     FileDialog {
         id: _fileDialog
-        title: "Please choose a file"
+        title: qsTr("Будь-ласка виберіть файл(и)")
         folder: shortcuts.music
         selectMultiple: true
         nameFilters: "Music files (*.mp3 *.mp4 *.wpa)"
@@ -149,6 +158,17 @@ Rectangle {
         }
         onRejected: {
             console.log("Canceled")
+        }
+    }
+
+    FileDialog {
+        id: _folderOpenDialog
+        title: qsTr("Будь-ласка виберіть папку")
+        selectFolder: true
+        folder: shortcuts.music
+
+        onAccepted: {
+            _textField.text = urlToPath(_folderOpenDialog.fileUrl)
         }
     }
 
@@ -171,18 +191,96 @@ Rectangle {
                 id: _columnOfRadioBtn
                 anchors.left: parent.left
 
-                RadioButton { text: qsTr("Dark") }
-                RadioButton { text: qsTr("Light");  checked: true }
+                RadioButton { text: qsTr("Темна") }
+                RadioButton { text: qsTr("Світла");  checked: true }
             }
         }
 
         onApplied: {
             var checkedBtn = _btnGroup.checkedButton
-            if (checkedBtn.text === "Light")
+            if (checkedBtn.text === qsTr("Світла"))
                 _mainWindow.Material.theme = Material.Light
-            else if (checkedBtn.text === "Dark")
+            else if (checkedBtn.text === qsTr("Темна"))
                 _mainWindow.Material.theme = Material.Dark
         }
     }
+    Dialog {
+        id: _changeDefaultMusicFolderDialog
+        width: 370
 
+        title: qsTr("Змінити шлях для скачування")
+
+        standardButtons: StandardButton.Save | StandardButton.Cancel
+        x: (_mainWindow.width - _changeDefaultMusicFolderDialog.width) / 2
+        y: (_mainWindow.height - _changeDefaultMusicFolderDialog.height) / 2
+
+        contentItem: Rectangle {
+
+            color: "transparent"
+            Column {
+                width: parent.width
+                Text {
+                    width: parent.width
+                    text: qsTr("Папка, у яку будуть скачуватися треки з серверу:")
+                    font.family: "Helvetica"
+                    font.pointSize: 10
+                    color: (Material.theme === Material.Dark)
+                           ? "#fff"
+                           : "#000"
+                }
+
+                Row {
+                    spacing: 5
+                    width: parent.width
+                    TextField {
+                        id: _textField
+                        width: parent.width - _overviewBtn.width - parent.spacing
+                        anchors.bottom: parent.bottom
+                        text: audioPlayer.downloadFolder
+                        placeholderText: qsTr("Введіть шлях до папки")
+                        selectByMouse: true
+                        focus: true
+                    }
+                    Button {
+                        id: _overviewBtn
+                        text: qsTr("Огляд...")
+                        font.family: "Helvetica"
+                        font.pointSize: 10
+                        anchors.bottom: parent.bottom
+
+                        onClicked: {
+                            _folderOpenDialog.open()
+                        }
+
+                    }
+
+                }
+
+            }
+        }
+
+        onAccepted: {
+            audioPlayer.downloadFolder = _textField.text
+
+        }
+    }
+    MessageDialog {
+        id: _connFailedMsgDialog
+        title: "Server status"
+        icon: StandardIcon.Question
+        text: "Connect to server failed!"
+        detailedText: "Try to connect a little later "
+        standardButtons: StandardButton.Ok
+    }
+
+    function urlToPath(urlString) {
+        var s
+        if (urlString.startsWith("file:///")) {
+            var k = urlString.charAt(9) === ':' ? 8 : 7
+            s = urlString.substring(k)
+        } else {
+            s = urlString
+        }
+        return s;
+    }
 }

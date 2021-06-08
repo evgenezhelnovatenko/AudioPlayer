@@ -9,32 +9,29 @@
 
 FtpClient::FtpClient()
 {
-    qDebug() << "current thread id(FtpClient()): " << QThread::currentThreadId();
-    // Load basic starting routine  (WSAstartup & local hostname)
-    Ftp::Init();
 
-    // Create the socket
-    sock = Ftp::createSocket();
-
-    //connect to the server
-    memset(&ServerAddr, 0, sizeof(ServerAddr));     /* Zero out structure */
-
-    ServerAddr.sin_family      = AF_INET;             /* Internet address family */
-    ServerAddr.sin_addr.s_addr = ResolveName(remoteHostname);   /* Server IP address */
-    ServerAddr.sin_port        = htons(CONNECT_ON_PORT); /* Server port */
-
-    int iResult = 0;
-    iResult = ::connect(sock, (struct sockaddr *) &ServerAddr, sizeof(ServerAddr));
-    if (iResult < 0) {
-        QString errorMsg("Socket Creating Error");
-        err_sys((char *)errorMsg.data());
-    }
-    qDebug() << "\nConnected to the server successfully";
 }
 
 FtpClient::~FtpClient(){
     WSACleanup();
     qDebug() << "FtpClient::~FtpClient()";
+}
+
+
+void FtpClient::connectToServer()
+{
+
+    if (connectionStatus() == 1) {
+        emit serverReadyToRequest();
+        return;
+    }
+
+    if (!createConnection()) {
+        emit connectionFailed();
+        return;
+    }
+
+    emit serverReadyToRequest();
 }
 
 void FtpClient::getMusicFile(QString filename){
@@ -94,11 +91,11 @@ void FtpClient::getAllMusicFilesInfo()
             return;
         }
 
-        QFile f("json.txt");
-        if (!f.open(QIODevice::WriteOnly)) {
-            qDebug() << "error open file";
-            return;
-        }
+//        QFile f("json.txt");
+//        if (!f.open(QIODevice::WriteOnly)) {
+//            qDebug() << "error open file";
+//            return;
+//        }
 
         while (true) {
             debug = recv(sock, (char*)&p, sizeof(Packet),0);
@@ -107,7 +104,7 @@ void FtpClient::getAllMusicFilesInfo()
                 buffer.write(p.buffer, BUFFER_SIZE);
 
                 // write to file
-                f.write(p.buffer, BUFFER_SIZE);
+//                f.write(p.buffer, BUFFER_SIZE);
 
             }
             else {
@@ -115,7 +112,7 @@ void FtpClient::getAllMusicFilesInfo()
                 buffer.write(p.buffer, p.footer);
 
                 // write to file
-                f.write(p.buffer, p.footer);
+//                f.write(p.buffer, p.footer);
                 break;
             }
         }
@@ -123,7 +120,7 @@ void FtpClient::getAllMusicFilesInfo()
         out << buffer.buffer();
 
         buffer.close();
-        f.close();
+//        f.close();
 
         QList<Song> songlist;
 
@@ -131,34 +128,6 @@ void FtpClient::getAllMusicFilesInfo()
             return;
 
         emit sendListOfMusicFromServerToModel(songlist);
-
-        /*for (auto& song : songlist) {
-            qDebug() << "id: " << song.id();
-            qDebug() << "title: " << song.title();
-            qDebug() << "url: " << song.url();
-            qDebug() << "year: " << song.year();
-            qDebug() << "length: " << song.length();
-
-            qDebug() << "\nautor: ";
-            qDebug() << "id: " << song.autor().id();
-            qDebug() << "firstname: " << song.autor().firstname();
-            qDebug() << "lastname: " << song.autor().lastname();
-            qDebug() << "pseudonym: " << song.autor().pseudonym();
-
-            qDebug() << "\ngenres: ";
-            for (const auto& genre : *(song.genres())) {
-                qDebug() << "id: " << genre.id() << "; name: " << genre.name();
-            }
-
-            qDebug() << "\nco_autors: ";
-            for (const auto& co_autor : *(song.co_autors())) {
-                qDebug() << "id: " << co_autor.id() ;
-                qDebug() << "firstname: " << co_autor.firstname();
-                qDebug() << "lastname: " << co_autor.lastname();
-                qDebug() << "pseudonym: " << co_autor.pseudonym();
-            }
-            qDebug() << "---------------------------------------";
-        }*/
     }
 
 }
@@ -184,4 +153,36 @@ bool FtpClient::doShutdown(){
     closesocket(sock);
     WSACleanup();
     return 0;
+}
+
+bool FtpClient::createConnection()
+{
+    // Load basic starting routine  (WSAstartup & local hostname)
+    if (!Ftp::Init())
+        return false;
+
+    // Create the socket
+    sock = Ftp::createSocket();
+
+    if (sock == SOCKET_ERROR || (SOCKET)sock == INVALID_SOCKET)
+        return false;
+
+    //connect to the server
+    memset(&ServerAddr, 0, sizeof(ServerAddr));     /* Zero out structure */
+
+    ServerAddr.sin_family      = AF_INET;             /* Internet address family */
+    ServerAddr.sin_addr.s_addr = ResolveName(remoteHostname);   /* Server IP address */
+    ServerAddr.sin_port        = htons(CONNECT_ON_PORT); /* Server port */
+
+    int iResult = 0;
+    iResult = ::connect(sock, (struct sockaddr *) &ServerAddr, sizeof(ServerAddr));
+    if (iResult < 0) {
+        QString errorMsg("Socket Creating Error");
+//        err_sys((char *)errorMsg.data());
+        return false;
+    }
+    qDebug() << "\nConnected to the server successfully";
+    status = 1;
+
+    return true;
 }

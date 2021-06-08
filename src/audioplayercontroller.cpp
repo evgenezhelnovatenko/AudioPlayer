@@ -8,6 +8,9 @@ AudioPlayerController::AudioPlayerController(QObject *parent)
     connect(m_model, &AudioPlayerModel::rowsAboutToBeInserted, this, &AudioPlayerController::modelHasBeenChanged);
     connect(this, &AudioPlayerController::getMusicFile, m_model, &AudioPlayerModel::getMusicFile);
     connect(this, &AudioPlayerController::getAllMusicFiles, m_model, &AudioPlayerModel::getAllMusicFiles);
+    connect(this, &AudioPlayerController::createServerConn, m_model, &AudioPlayerModel::connectToServer);
+    connect(m_model, &AudioPlayerModel::connectionFailed, this, &AudioPlayerController::connectionFailed);
+    connect(m_model, &AudioPlayerModel::serverReadyToRequest, this, &AudioPlayerController::serverReadyToRequest);
 }
 
 AudioPlayerController::~AudioPlayerController()
@@ -74,35 +77,41 @@ void AudioPlayerController::getMyMusic()
 
 Song *AudioPlayerController::getSong(int index)
 {
-    Song* song = m_model->getRow(index);
-    return song;
+    return m_model->getRow(index);
 }
 
 Autor *AudioPlayerController::getAutorOfSong(int index)
 {
-    Song* song = getSong(index);
-    Autor* autor = song->autor();
+    Autor* autor = new Autor(getSong(index)->autor(), this);
+
     return autor;
 }
 
 QList<Genre*> AudioPlayerController::getGenresOfSong(int index)
 {
-    Song* song = getSong(index);
     QList<Genre*> genres;
-    for (auto& genre : *(song->genres())) {
-        genres.push_back(&genre);
+    for (auto& genre : getSong(index)->genres()) {
+        Genre *g = new Genre(genre, this);
+        genres.push_back(g);
     }
+
     return genres;
 }
 
-QList<CoAutor *> AudioPlayerController::getCoAutorsOfSong(int index)
+QList<CoAutor*> AudioPlayerController::getCoAutorsOfSong(int index)
 {
-    Song* song = getSong(index);
     QList<CoAutor*> co_autors;
-    for (auto& co_autor : *(song->co_autors())) {
-        co_autors.push_back(&co_autor);
+    for (auto& co_autor : getSong(index)->co_autors()) {
+        CoAutor *c_a = new CoAutor(co_autor, this);
+        co_autors.push_back(c_a);
     }
+
     return co_autors;
+}
+
+void AudioPlayerController::connectToServer()
+{
+    emit createServerConn();
 }
 
 void AudioPlayerController::getAllMusicFilesInfoFromServer()

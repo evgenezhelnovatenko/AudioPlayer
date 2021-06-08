@@ -32,6 +32,7 @@ public:
     Q_INVOKABLE QList<CoAutor*> getCoAutorsOfSong(int index);
 
     /* Методи запитів до сервера */
+    Q_INVOKABLE void connectToServer();
     Q_INVOKABLE void getMusicFileFromServer(QString msg);
     Q_INVOKABLE void getAllMusicFilesInfoFromServer();
 
@@ -42,6 +43,9 @@ signals:
     void currentSongIndexChanged();
     void playlistHasBeenChanged();
     void modelHasBeenChanged();
+    void createServerConn();
+    void connectionFailed();
+    void serverReadyToRequest();
     void getMusicFile(QString);
     void getAllMusicFiles();
 private:

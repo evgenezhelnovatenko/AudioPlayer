@@ -12,18 +12,10 @@ MenuBar {
 
         Action {
             id: _addAction
-            text: qsTr("Додати пісні")
+            text: qsTr("Додати треки")
             shortcut: "Ctrl+G"
             onTriggered: {
                 _fileDialog.visible = true
-            }
-        }
-        Action {
-            id: _getRequest
-            text: qsTr("На сервер ->")
-            onTriggered: {
-                var message = "mr-nyoma-gr-dombaj-priora-remix-mp3.mp3"
-                _audioPlayerController.getMusicFile(message)
             }
         }
         Action {
@@ -31,6 +23,13 @@ MenuBar {
             text: qsTr("Змінити тему")
             onTriggered: {
                 _changeThemeDialog.open()
+            }
+        }
+        Action {
+            id: _changeDefaultMusicFolder
+            text: qsTr("Змінити шлях")
+            onTriggered: {
+                _changeDefaultMusicFolderDialog.open()
             }
         }
 

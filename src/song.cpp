@@ -5,8 +5,9 @@ Song::Song(QObject *parent) : QObject(parent)
 
 }
 
-Song::Song(const Song &other)
-    : m_id(other.m_id)
+Song::Song(const Song &other, QObject *parent)
+    : QObject(parent)
+    , m_id(other.m_id)
     , m_title(other.m_title)
     , m_url(other.m_url)
     , m_year(other.m_year)
@@ -56,7 +57,7 @@ void Song::setTitle(QString title)
 
     m_title = title;
 
-    emit m_titleChanged(m_title);
+    emit titleChanged(m_title);
 }
 
 QString Song::title() const
@@ -71,7 +72,7 @@ void Song::setUrl(QString url)
 
     m_url = url;
 
-    emit m_urlChanged(m_url);
+    emit urlChanged(m_url);
 }
 
 QString Song::url() const
@@ -86,7 +87,7 @@ void Song::setYear(int year)
 
     m_year = year;
 
-    emit m_yearChanged(m_year);
+    emit yearChanged(m_year);
 }
 
 int Song::year() const
@@ -101,7 +102,7 @@ void Song::setLength(int length)
 
     m_length = length;
 
-    emit m_lengthChanged(m_length);
+    emit lengthChanged(m_length);
 }
 
 int Song::length() const
@@ -117,9 +118,9 @@ void Song::setAutor(Autor autor)
     m_autor = autor;
 }
 
-Autor* Song::autor()
+Autor Song::autor()
 {
-    return &m_autor;
+    return m_autor;
 }
 
 void Song::setGenres(const std::list<Genre>& genres)
@@ -130,9 +131,9 @@ void Song::setGenres(const std::list<Genre>& genres)
     m_genres = genres;
 }
 
-std::list<Genre>* Song::genres()
+std::list<Genre> Song::genres()
 {
-    return &m_genres;
+    return m_genres;
 }
 
 void Song::setCo_autors(const std::list<CoAutor>& co_autors)
@@ -143,7 +144,7 @@ void Song::setCo_autors(const std::list<CoAutor>& co_autors)
     m_co_autors = co_autors;
 }
 
-std::list<CoAutor>* Song::co_autors()
+std::list<CoAutor> Song::co_autors()
 {
-    return &m_co_autors;
+    return m_co_autors;
 }

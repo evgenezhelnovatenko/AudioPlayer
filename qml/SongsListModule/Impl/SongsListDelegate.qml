@@ -30,7 +30,7 @@ Rectangle {
                 source: Resources.songsList.volumeSoundIco
                 fillMode: Image.PreserveAspectFit
 
-                visible: (_player.playlist.currentIndex === index && !isEditModeEnabled) ? true : false
+                visible: (_player.playlist.currentIndex === index && !isEditModeEnabled && !isServerMusicListSelected) ? true : false
             }
         }
 
@@ -53,7 +53,7 @@ Rectangle {
                 fillMode: Image.PreserveAspectFit
 
                 visible: isEditModeEnabled
-                z: 1
+                z: 4
 
                 MouseArea {
                     id: _deleteSongArea
@@ -61,6 +61,7 @@ Rectangle {
                     hoverEnabled: true
 
                     onClicked: {
+                        console.log(index)
                         _songsListView.deleteSong(index)
                     }
                 }
@@ -79,7 +80,7 @@ Rectangle {
 
     MouseArea {
         id: _mouseArea
-        visible: true  //!_deleteSongArea.containsMouse
+        visible: !_deleteSongArea.containsMouse
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
@@ -98,7 +99,7 @@ Rectangle {
 
         onDoubleClicked: {
 
-            if (isEditModeEnabled)
+            if (isEditModeEnabled || isServerMusicListSelected)
                 return
 
             _audioPlayerController.setIndexOfIndices(index)

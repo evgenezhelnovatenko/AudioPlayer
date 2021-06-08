@@ -20,15 +20,17 @@ Rectangle {
         BaseText {
             id: _myMusic
             text: qsTr("Музика на пристрої")
+            isSelected: true
 
             MouseArea {
                 anchors.fill: parent
 
                 onClicked: {
-                    if (!_myMusic.isSelected)
+                    if (!_myMusic.isSelected) {
                         _audioPlayerController.getMyMusic();
-                    _myMusic.isSelected = true
-                    _musicForDownload.isSelected = false
+                        changeCurrentSelectedItem()
+                        unblockingUnnecessaryFunctions()
+                    }
 
                     _songsListView.changePopupMenu()
                 }
@@ -42,12 +44,11 @@ Rectangle {
                 anchors.fill: parent
 
                 onClicked: {
-                    if (!_musicForDownload.isSelected)
-                        _audioPlayerController.getAllMusicFilesInfoFromServer();
-                    _musicForDownload.isSelected = true
-                    _myMusic.isSelected = false
-
-                    _songsListView.changePopupMenu()
+                    if (!_musicForDownload.isSelected) {
+                        _audioPlayerController.connectToServer()
+                        changeCurrentSelectedItem()
+                        blockingUnnecessaryFunctions()
+                    }
                 }
             }
         }
@@ -63,4 +64,21 @@ Rectangle {
         opacity: 0.25
         radius: 5
     }
+
+    function changeCurrentSelectedItem() {
+        _musicForDownload.isSelected= !_musicForDownload.isSelected
+        _myMusic.isSelected = !_myMusic.isSelected
+    }
+
+    function blockingUnnecessaryFunctions() {
+        _mainInteface.isServerMusicListSelected = true
+        _player.pause()
+        isSongPlaying = false
+        if (_mainInteface.isEditModeEnabled)
+            _mainInteface.isEditModeEnabled = false
+    }
+    function unblockingUnnecessaryFunctions() {
+        _mainInteface.isServerMusicListSelected = false
+    }
+
 }

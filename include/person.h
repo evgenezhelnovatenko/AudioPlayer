@@ -7,9 +7,9 @@ class Person : public QObject
 {
     Q_OBJECT
 
-//    Q_PROPERTY(QString m_firstname READ firstname WRITE setFirstname NOTIFY m_firstnameChanged)
-//    Q_PROPERTY(QString m_lastname READ lastname WRITE setLastname NOTIFY m_lastnameChanged)
-//    Q_PROPERTY(QString m_pseudonym READ pseudonym WRITE setPseudonym NOTIFY m_pseudonymChanged)
+    Q_PROPERTY(QString firstname READ firstname WRITE setFirstname NOTIFY firstnameChanged)
+    Q_PROPERTY(QString lastname READ lastname WRITE setLastname NOTIFY lastnameChanged)
+    Q_PROPERTY(QString pseudonym READ pseudonym WRITE setPseudonym NOTIFY pseudonymChanged)
 
 
 public:
@@ -19,11 +19,11 @@ public:
 
     void setId(int id);						  // set id.
     int id() const;								  // get id.
-    virtual void setFirstname(QString firstname); // set firsname.
+    void setFirstname(QString firstname); // set firsname.
     QString firstname() const;				  // get firstname.
-    virtual void setLastname(QString lastname);   // set lastname.
+    void setLastname(QString lastname);   // set lastname.
     QString lastname() const;					  // get lastname.
-    virtual void setPseudonym(QString pseudonym); // set pseudonym.
+    void setPseudonym(QString pseudonym); // set pseudonym.
     QString pseudonym() const;				  // get pseudonym.
 
     friend bool operator== (const Person& a1, const Person& a2);
@@ -41,12 +41,12 @@ public:
     }
 
 
-//signals:
-//    void m_firstnameChanged(QString m_firstname);
+signals:
+    void firstnameChanged(QString firstname);
 
-//    void m_lastnameChanged(QString m_lastname);
+    void lastnameChanged(QString lastname);
 
-//    void m_pseudonymChanged(QString m_pseudonym);
+    void pseudonymChanged(QString pseudonym);
 
 protected:
     int m_id = -1;

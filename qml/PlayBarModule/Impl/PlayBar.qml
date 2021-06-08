@@ -62,7 +62,7 @@ Rectangle {
                         width: 20
                         height: 20
                         color: "transparent"
-                        enabled: audioPlayer.currentSongIndex === -1 ? false : true
+//                        enabled: audioPlayer.currentSongIndex === -1 ? false : true
 
                         Image {
                             width: parent.width
@@ -73,7 +73,9 @@ Rectangle {
                         }
 
                         MouseArea {
-                            visible: !isEditModeEnabled
+                            visible: (isEditModeEnabled
+                                      || isServerMusicListSelected
+                                      || audioPlayer.currentSongIndex === -1) ? false : true
                             id: prevArea
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
@@ -89,6 +91,7 @@ Rectangle {
                         width: 20
                         height: 20
                         color: "transparent"
+//                        enabled: audioPlayer.currentSongIndex === -1 ? false : true
 
                         Image {
                             width: parent.width
@@ -99,7 +102,9 @@ Rectangle {
                         }
 
                         MouseArea {
-                            visible: !isEditModeEnabled
+                            visible: (isEditModeEnabled
+                                      || isServerMusicListSelected
+                                      || audioPlayer.currentSongIndex === -1) ? false : true
                             id: _playOrPauseArea
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
@@ -132,7 +137,7 @@ Rectangle {
                         }
 
                         MouseArea {
-                            visible: !isEditModeEnabled
+                            visible: (isEditModeEnabled || isServerMusicListSelected) ? false : true
                             id: _nextArea
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
@@ -214,6 +219,7 @@ Rectangle {
             RowLayout {
                 anchors.fill: parent
                 spacing: 2
+                visible: !isServerMusicListSelected
 
                 Rectangle {
 

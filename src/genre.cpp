@@ -5,8 +5,9 @@ Genre::Genre(QObject *parent) : QObject(parent)
 
 }
 
-Genre::Genre(const Genre &other)
-    : m_id(other.m_id)
+Genre::Genre(const Genre &other, QObject *parent)
+    : QObject(parent)
+    , m_id(other.m_id)
     , m_name(other.m_name)
 {
 
@@ -39,7 +40,7 @@ void Genre::setName(QString name)
 
     m_name = name;
 
-    emit m_nameChanged(m_name);
+    emit nameChanged(m_name);
 }
 
 QString Genre::name() const

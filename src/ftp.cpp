@@ -2,7 +2,18 @@
 #include <QDebug>
 #include <QFile>
 
-void Ftp::Init(){
+
+QString Ftp::getDEFAULT_FOLDER() const
+{
+    return DEFAULT_FOLDER;
+}
+
+void Ftp::setDEFAULT_FOLDER(const QString &value)
+{
+    DEFAULT_FOLDER = value;
+}
+
+bool Ftp::Init(){
     qDebug() << "/***********************************/";
     qDebug() << "/*  Welcome to FTP Client   */";
     qDebug() << "/***********************************/";
@@ -11,15 +22,19 @@ void Ftp::Init(){
     if (WSAStartup(0x0202,&wsaData) != 0)	{
         WSACleanup();
         QString errorMsg("Error in starting WSAStartup()");
-        err_sys((char *)errorMsg.data());
+//        err_sys((char *)errorMsg.data());
+        return false;
     }
     qDebug() << "Winsock started.\n";
     // Get and print our own hostname
     if(gethostname(myHostname, HOSTNAME_LENGTH) != 0 ) {
         QString errorMsg("can not get the host name,program exit");
-        err_sys((char *)errorMsg.data());
+//        err_sys((char *)errorMsg.data());
+        return false;
     }
     qDebug() << "Starting at host: " << myHostname;
+
+    return true;
 }
 
 
@@ -30,11 +45,13 @@ int Ftp::createSocket(){
 
     if((SOCKET)sock == INVALID_SOCKET ) {
         QString errorMsg("Invalid Socket ");
-        err_sys((char *)errorMsg.data(),WSAGetLastError());
+//        err_sys((char *)errorMsg.data(),WSAGetLastError());
+        return sock;
     }
     else if(sock==SOCKET_ERROR) {
         QString errorMsg("Socket Error)");
-        err_sys((char *)errorMsg.data(),WSAGetLastError());
+//        err_sys((char *)errorMsg.data(),WSAGetLastError());
+        return sock;
     }
     else
         qDebug()<<"SOCKET Established";
@@ -42,7 +59,8 @@ int Ftp::createSocket(){
     iResult = setsockopt(sock,SOL_SOCKET,SO_REUSEADDR, (char *) &bOptVal, bOptLen);
     if (iResult == SOCKET_ERROR) {
         QString errorMsg("setsockopt for SO_REUSEADDR failed with error: ");
-        err_sys((char *)errorMsg.data(), WSAGetLastError());
+//        err_sys((char *)errorMsg.data(), WSAGetLastError());
+        return sock;
     }
     else
         qDebug()<<"Set SO_REUSEADDR: ON";
@@ -78,6 +96,8 @@ bool Ftp::recvFileAndWrite(char* filename, int sock){
     int test;
 
     char fname[FILENAME_LENGTH+1] = "";
+    strcat(fname, DEFAULT_FOLDER.toUtf8().data());
+    strcat(fname, "\\");
     strcat(fname, filename);
 
     // Open
@@ -91,15 +111,12 @@ bool Ftp::recvFileAndWrite(char* filename, int sock){
     }
 
     while ( true ) {
-        //qDebug() << i << endl;
         test = recv(sock,(char*)&p, sizeof(Packet),0);
-        //qDebug() << test;
 
         if(p.footer == 0)
             os.write(p.buffer, BUFFER_SIZE);
         else{
             os.write(p.buffer, p.footer);
-            //qDebug() << "last packet sent of size: " << p.footer << endl;
             break;
         }
     }
@@ -118,6 +135,11 @@ void Ftp::err_sys(char *fmt,...)
     fprintf(stderr,"\n");
     va_end(args);
     exit(1);
+}
+
+int Ftp::connectionStatus()
+{
+    return status;
 }
 
 
